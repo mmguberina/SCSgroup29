@@ -22,6 +22,10 @@ the speed per item is ok if we are comparing different algorithms in the same si
 grid size, expected number of items etc), but how to compare
 the same algorithm on various situations?
 
+- how to include package placement in the this? 
+if we have developed the robot algorithms then we can ask how to place the items
+so that the delivery time is the lowest
+
 
 
 in the following assume every item can be picked up by 1 robot

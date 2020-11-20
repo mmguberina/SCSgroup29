@@ -1,0 +1,32 @@
+import numpy as np
+from robot import *
+from warehouse import *
+from visualizeWarehouse import *
+from celluloid import camera
+
+#def randomWalkers(warehouse):
+
+came
+
+for i in range(1000):
+    nOfDeliveredItems = 0
+    robot_positions = warehouse.getRobotPositions()
+
+    for robot in warehouse.robots:
+        if robot.getPosition() in warehouse.items:
+            robot.storage.append(robot.getPosition())
+            warehouse.items.remove(robot.getPosition())
+            robot.state = 1
+
+        if robot.state == 2:
+            nOfDeliveredItems += len(robot.emptyStorage())
+
+        if robot.state == 0:
+            robot.moveRandomly()
+        else:
+            robot.moveToSpecificPoint(warehouse.delivery_station)
+
+
+
+
+
