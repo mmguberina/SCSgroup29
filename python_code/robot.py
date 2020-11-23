@@ -15,12 +15,18 @@ class Robot:
     this class exists just for compartmentalization purposes.
     everything should be self-explanatory
     """
-    def __init__(self, position, state, gridSize, visibilityRadius):
+    def __init__(self, position, state, gridSize, 
+            visibilityRadius=None, repulsionF=None, attractionF=None):
         self.position = position
         self.state = state
         self.gridSize = gridSize
         self.storage = []
-        self.visibilityRadius = visibilityRadius
+        if visibilityRadius != None:
+            self.visibilityRadius = visibilityRadius
+        if repulsionF != None:
+            self.repulsionF = repulsionF
+        if attractionF!= None:
+            self.attractionF = attractionF
 
 
     def __str__(self):
@@ -55,24 +61,36 @@ class Robot:
         if self.position[0] > 0:
             self.position[0] -= 1
 
-    def moveRandomly(self):
-        outcome = np.random.randint(4)
-        if outcome == 0:
-            self.moveUp()
-        if outcome == 1:
-            self.moveDown()
-        if outcome == 2:
-            self.moveRight()
-        if outcome == 3:
-            self.moveLeft()
+    def move(self, probs=None):
+        if probs == None:
+            outcome = np.random.randint(4)
+            if outcome == 0:
+                self.moveUp()
+            if outcome == 1:
+                self.moveDown()
+            if outcome == 2:
+                self.moveRight()
+            if outcome == 3:
+                self.moveLeft()
+
+        else:
+            outcome = np.random.random()
+            if outcome < probs[0]:
+                self.moveUp()
+            if outcome >= probs[0] and outcome < probs[1]:
+                self.moveDown()
+            if outcome >= probs[1] and outcome < probs[2]:
+                self.moveRight()
+            if outcome >= probs[2]:
+                self.moveLeft()
     
     def getPosition(self):
         return tuple(self.position)
 
     def getVisibilitySphere(self):
-        visibilitySphere = {}
+        visibilitySphere = set()
         toVisit = deque()
-        deque.append(self.position)
+        toVisit.append(self.position)
         visibilitySphere.add(tuple(self.position))
         # the range is the number of total points of distance < visibilityRadius
         # the formula is easy to derive
@@ -84,7 +102,7 @@ class Robot:
             neighbors.append(currentNode - [0,1])
             neighbors.append(currentNode - [1,0])
             for n in neighbors:
-                if n not in visibilitySphere:
+                if tuple(n) not in visibilitySphere:
                     toVisit.append(n)
                     visibilitySphere.add(tuple(n))
         return visibilitySphere
@@ -114,8 +132,60 @@ class Robot:
             else:
                 self.position[0] += np.sign(direction[0])
 
-    def movePSOStyle(self, surroundingObjects):
-        pass
+
+
+    def movePSOStyle(self, nearRobots, nearItems):
+        upProb, downProb, rightProb, leftProb = [0.25] * 4;
+        for item in nearItems:
+            vecToItem = self.position
+            vecToItem[0] -= item[1]
+            vecToItem[1] -= item[1]
+            distanceToItem = np.abs(vecToItem[0]) + np.abs(vecToItem[1])
+
+            if vecToItem[0] >= 0 and vecToItem[1] >= 0:
+                rightProb += self.attractionF * vecToItem[0]/distanceToItem
+                upProb += self.attractionF *vecToItem[1]/distanceToItem
+
+            if vecToItem[0] <= 0 and vecToItem[1] >= 0:
+                leftProb += self.attractionF *np.abs(vecToItem[0])/distanceToItem
+                upProb += self.attractionF *vecToItem[1]/distanceToItem
+
+            if vecToItem[0] <= 0 and vecToItem[1] <= 0:
+                leftProb += self.attractionF *np.abs(vecToItem[0])/distanceToItem
+                downProb += self.attractionF *np.abs(vecToItem[1])/distanceToItem
+
+            if vecToItem[0] >= 0 and vecToItem[1] <= 0:
+                rightProb += self.attractionF *vecToItem[0]/distanceToItem
+                down += self.attractionF *np.abs(vecToItem[1])/distanceToItem
+
+
+        for robot in nearRobots:
+            vecToRobot = self.position
+            vecToRobot[0] -= robot[1]
+            vecToRobot[1] -= robot[1]
+            distanceToRobot = np.abs(vecToRobot[0]) + np.abs(vecToRobot[1])
+
+            if vecToRobot[0] >= 0 and vecToRobot[1] >= 0:
+                rightProb -= self.repulsionF * vecToRobot[0]/distanceToRobot
+                upProb -= self.repulsionF * vecToRobot[1]/distanceToRobot
+
+            if vecToRobot[0] <= 0 and vecToRobot[1] >= 0:
+                leftProb -= self.repulsionF * np.abs(vecToRobot[0])/distanceToRobot
+                upProb -= self.repulsionF * vecToRobot[1]/distanceToRobot
+
+            if vecToRobot[0] <= 0 and vecToRobot[1] <= 0:
+                leftProb -= self.repulsionF * np.abs(vecToRobot[0])/distanceToRobot
+                downProb -= self.repulsionF * np.abs(vecToRobot[1])/distanceToRobot
+
+            if vecToRobot[0] >= 0 and vecToRobot[1] <= 0:
+                rightProb -= self.repulsionF * vecToRobot[0]/distanceToRobot
+                downProb -= self.repulsionF * np.abs(vecToRobot[1])/distanceToRobot
+
+        # and now we need to normalize to have probabilities
+        sumOfProbs = upProb + downProb + rightProb + leftProb
+        probs = np.array([upProb, downProb, rightProb, leftProb]) / sumOfProbs
+        self.move(probs=probs)
+        
 
 
 

@@ -8,7 +8,8 @@ even though every piece of information is stored here,
 the robots only have access to their surroundings
 """
 class Warehouse:
-    def __init__(self, populationSize, gridSize, packageAppearanceProb, delivery_station):
+    def __init__(self, populationSize, gridSize, packageAppearanceProb, delivery_station,
+            visibilityRadius=None, attractionF=None, repulsionF=None):
         self.populationSize = populationSize
         self.gridSize = gridSize
         self.delivery_station = np.array(delivery_station)
@@ -49,8 +50,16 @@ class Warehouse:
         positions = np.array(list(map(list, positions)))
         individualStates = np.zeros(self.populationSize)
         # store robots in a list
-        self.robots = [Robot(positions[i], individualStates[i], gridSize, 3) 
-                for i in range(populationSize)]
+        if visibilityRadius == None:
+            self.robots = [Robot(positions[i], individualStates[i], gridSize, 3) 
+                    for i in range(populationSize)]
+        else:
+            self.robots = [Robot(positions[i], individualStates[i], gridSize, 
+                visibilityRadius=visibilityRadius, 
+                attractionF=attractionF, repulsionF=repulsionF) 
+                    for i in range(populationSize)]
+
+        self.robot_positions = self.getRobotPositions()
 
         # initialize items
         item_positions = set(map(tuple, np.fix(np.random.random((self.populationSize,2)) * self.gridSize)))
@@ -81,5 +90,12 @@ class Warehouse:
             for j in range(self.gridSize[1]):
                 if outcome[i][j] < self.growthProb:
                     self.item_positions.add((i,j))
+
+    def checkVisibilitySphere(self, visibilitySphere):
+        robots = {i for i in visibilitySphere if i in self.robot_positions}
+        items = {i for i in visibilitySphere if i in self.item_positions}
+        return robots, items
+        
+
 
 
