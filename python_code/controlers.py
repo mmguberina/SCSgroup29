@@ -58,7 +58,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     camera = Camera(fig)
 
-    visibilityRadius = 3
+    visibilityRadius = 10
     attractionF = 2
     repulsionF = 2
 

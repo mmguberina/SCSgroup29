@@ -133,8 +133,14 @@ class Robot:
                 self.position[0] += np.sign(direction[0])
 
 
-
+    
     def movePSOStyle(self, nearRobots, nearItems):
+        """
+        the here is to add forces and then normalize everything to
+        probabilities. no idea whether this is the right way to do it tho.
+        maybe it should be more like in the active swimmers case from csc hw3.
+        that certainly seems like the correct approach for the continuous case
+        """
         upProb, downProb, rightProb, leftProb = [0.25] * 4;
         for item in nearItems:
             vecToItem = self.position
@@ -156,35 +162,45 @@ class Robot:
 
             if vecToItem[0] >= 0 and vecToItem[1] <= 0:
                 rightProb += self.attractionF *vecToItem[0]/distanceToItem
-                down += self.attractionF *np.abs(vecToItem[1])/distanceToItem
+                downProb += self.attractionF *np.abs(vecToItem[1])/distanceToItem
 
-
+        # in order not to have negative values, just add to the opposite direction
+        # hopefully that makes sense
         for robot in nearRobots:
-            vecToRobot = self.position
+            vecToRobot = copy.deepcopy(self.position)
             vecToRobot[0] -= robot[1]
             vecToRobot[1] -= robot[1]
             distanceToRobot = np.abs(vecToRobot[0]) + np.abs(vecToRobot[1])
 
             if vecToRobot[0] >= 0 and vecToRobot[1] >= 0:
-                rightProb -= self.repulsionF * vecToRobot[0]/distanceToRobot
-                upProb -= self.repulsionF * vecToRobot[1]/distanceToRobot
+          #      rightProb -= self.repulsionF * vecToRobot[0]/distanceToRobot
+          #      upProb -= self.repulsionF * vecToRobot[1]/distanceToRobot
+                leftProb += self.repulsionF * vecToRobot[0]/distanceToRobot
+                downProb += self.repulsionF * vecToRobot[1]/distanceToRobot
+
 
             if vecToRobot[0] <= 0 and vecToRobot[1] >= 0:
-                leftProb -= self.repulsionF * np.abs(vecToRobot[0])/distanceToRobot
-                upProb -= self.repulsionF * vecToRobot[1]/distanceToRobot
+                #leftProb -= self.repulsionF * np.abs(vecToRobot[0])/distanceToRobot
+                #upProb -= self.repulsionF * vecToRobot[1]/distanceToRobot
+                rightProb += self.repulsionF * np.abs(vecToRobot[0])/distanceToRobot
+                downProb += self.repulsionF * vecToRobot[1]/distanceToRobot
 
             if vecToRobot[0] <= 0 and vecToRobot[1] <= 0:
-                leftProb -= self.repulsionF * np.abs(vecToRobot[0])/distanceToRobot
-                downProb -= self.repulsionF * np.abs(vecToRobot[1])/distanceToRobot
+                #leftProb -= self.repulsionF * np.abs(vecToRobot[0])/distanceToRobot
+                #downProb -= self.repulsionF * np.abs(vecToRobot[1])/distanceToRobot
+                rightProb += self.repulsionF * np.abs(vecToRobot[0])/distanceToRobot
+                upProb += self.repulsionF * np.abs(vecToRobot[1])/distanceToRobot
 
             if vecToRobot[0] >= 0 and vecToRobot[1] <= 0:
-                rightProb -= self.repulsionF * vecToRobot[0]/distanceToRobot
-                downProb -= self.repulsionF * np.abs(vecToRobot[1])/distanceToRobot
+                #rightProb -= self.repulsionF * vecToRobot[0]/distanceToRobot
+                #downProb -= self.repulsionF * np.abs(vecToRobot[1])/distanceToRobot
+                leftProb += self.repulsionF * vecToRobot[0]/distanceToRobot
+                upProb  += self.repulsionF * np.abs(vecToRobot[1])/distanceToRobot
 
         # and now we need to normalize to have probabilities
         sumOfProbs = upProb + downProb + rightProb + leftProb
         probs = np.array([upProb, downProb, rightProb, leftProb]) / sumOfProbs
-        self.move(probs=probs)
+        self.move(probs=list(probs))
         
 
 
