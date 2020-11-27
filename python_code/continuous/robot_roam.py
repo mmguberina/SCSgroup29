@@ -60,6 +60,10 @@ def activeSwimmers(x, y, fi, item_positions, n, dt, T0, nOfParticles, ni, v, tra
             if rnorms[i] > torque_radius:
                 particle_torques[i] = 0
 
+            # make this work
+            if rnorms_item[i] > torque_radius:
+                particle_torques_item[i] = 0
+
             torque[i] = np.sum(particle_torques) 
             torque_item[i] = np.sum(particle_torques_item) 
 #            print(torque)
