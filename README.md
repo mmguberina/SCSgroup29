@@ -32,6 +32,11 @@ in the following assume every item can be picked up by 1 robot
 -------------------------------------------------------------
 PSO inspired continuous model
 --------------------------
+
+====> try the torque model from SCS homework3 first!!!
+====> active-active torque from hw for attraction to items,
+	  active-passive for robots
+
 - robots are circles (easy to check distances)
 - no robots (circles) can overlap
 - robots move in a directed brownian motion, but so that

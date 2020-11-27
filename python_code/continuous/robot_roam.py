@@ -5,9 +5,9 @@ from celluloid import Camera
 import matplotlib
 
 
-def activeSwimmers(x, y, fi, n, dt, T0, nOfParticles, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, out=None):
+def activeSwimmers(x, y, fi, item_positions, n, dt, T0, nOfParticles, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, out=None):
 
-
+    nOfItems = len(item_positions)
     actActNeig = {i:[] for i in range(nOfParticles)}
     for step in range(n):
 
@@ -21,8 +21,10 @@ def activeSwimmers(x, y, fi, n, dt, T0, nOfParticles, ni, v, trans_dif_T, rot_di
                             np.sin(fi[:, step]).reshape((nOfParticles,1))))
         # init torque
         torque = np.zeros((nOfParticles,1))
+        torque_item = np.zeros((nOfParticles,1))
 
         # TODO
+        # BUT FIRST TRY THE HW3 MODEL 
         # calculate some other torque model
         # for instance the attraction-repulsion like with charged particles
         # attracted towards the item, repeled from other robots
@@ -32,30 +34,41 @@ def activeSwimmers(x, y, fi, n, dt, T0, nOfParticles, ni, v, trans_dif_T, rot_di
         for i in range(1, nOfParticles):
             # calculate direction vector to every vector ( r_i,i is not a thing tho)
             r = pos[i] - pos 
+            r_item = pos[i] - item_positions 
             # calculate the norm of every direction vector
             rnorms = np.linalg.norm(r, axis=1).reshape((nOfParticles,1))
+            rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
             # collect only nearby ones
             actActNeig[i] = [part for part in range(nOfParticles) if rnorms[part] < 10 * particle_radius]
             # we need rhat
             r_hat  = r / rnorms
+            r_item_hat  = r_item / rnorms_item
             r_hat[i] = np.zeros(2)
             # dot 'em. dot does not support axis thing so we do it like this 
             dots = np.sum(v_hat[i] * r_hat, axis=1).reshape((nOfParticles,1))
-            coefs = dots / rnorms**2 # check whether the shapes are ok here, it works if they are
+            dots_item = np.sum(v_hat[i] * r_item_hat, axis=1).reshape((nOfItems,1))
+            coefs = dots / rnorms**2 
+            coefs_item = dots_item / rnorms_item**2 
+            # try repelling them now
             coefs[i] = 0
             # crosses v_i with r_i and does so for all i
             crosses = np.cross(v_hat[i], r_hat).reshape((nOfParticles, 1))
+            crosses_item = np.cross(v_hat[i], r_item_hat).reshape((nOfItems, 1))
             particle_torques = coefs * crosses
+            particle_torques_item = coefs_item * crosses_item
 
             if rnorms[i] > torque_radius:
                 particle_torques[i] = 0
 
             torque[i] = np.sum(particle_torques) 
+            torque_item[i] = np.sum(particle_torques_item) 
 #            print(torque)
 
 
         torque = T0 * torque
-        fi[:, step+1] = fi[:, step] + torque.reshape((nOfParticles,)) \
+        torque_item = T0 * torque_item
+        fi[:, step+1] = fi[:, step] + torque_item.reshape((nOfParticles,)) \
+                            - torque.reshape((nOfParticles,)) \
                             + randFactors.reshape((nOfParticles,))
         v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfParticles,1))), 
                             np.sin(fi[:, step+1].reshape((nOfParticles,1)))))
@@ -86,7 +99,7 @@ def activeSwimmers(x, y, fi, n, dt, T0, nOfParticles, ni, v, trans_dif_T, rot_di
 
 
 
-nOfParticles = 100
+nOfParticles = 30
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -116,7 +129,11 @@ fi = np.zeros((1 * nOfParticles,N+1))
 fi[:,0] = np.random.random(nOfParticles) * 2*np.pi
 #x[:, 0] = 0.0
 
-x, y = activeSwimmers(x, y, fi, N, dt, torque0, nOfParticles, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
+
+# 5 items
+item_positions = np.fix(np.random.random((5, 2)) * gridSize)
+
+x, y = activeSwimmers(x, y, fi, item_positions, N, dt, torque0, nOfParticles, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
 
 fig, ax = plt.subplots()
 ax.grid()
@@ -148,8 +165,10 @@ for timestep in range(N):
 
         cluster2 = np.array(list(cluster2))
 
-        ax.scatter(cluster2[:, 0], cluster2[:, 1], s=s, color='blue')
         ax.scatter(x[:, timestep], y[:, timestep], s=s, color='red')
+        ax.scatter(item_positions[:, 0], item_positions[:, 1], s=s, color='green')
+        if len(cluster2 > 0):
+            ax.scatter(cluster2[:, 0], cluster2[:, 1], s=s, color='blue')
         camera.snap()
 
 #plt.show()
