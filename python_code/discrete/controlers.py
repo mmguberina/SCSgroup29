@@ -64,13 +64,11 @@ if __name__ == "__main__":
 
     warehouse = Warehouse(5, [20,30], 0.1, [10,10], visibilityRadius=visibilityRadius,
             attractionF=attractionF, repulsionF=repulsionF)
-    PSOlikeMovers(warehouse, ax, camera)
+#    PSOlikeMovers(warehouse, ax, camera)
+    randomMovers(warehouse, ax, camera)
 
     animation = camera.animate()
     animation.save("somerun.mp4")
     plt.show()
-
-
-
 
 

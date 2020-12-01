@@ -118,7 +118,7 @@ class Robot:
     def moveToSpecificPoint(self, point):
         direction = point - self.position
         if direction[0] == 0 and direction[1] == 0:
-            self.state == 2
+            self.state = 2
             return
         outcome = np.random.random()
         if outcome < 0.5:
