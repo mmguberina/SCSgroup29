@@ -2,27 +2,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 from celluloid import Camera
 
-def visualise(x, y, item_positions, N, nOfParticles, particle_radius, ax, camera, s):
+def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s):
 
     for timestep in range(N):
-       # for i in range(nOfParticles):
+       # for i in range(nOfRobots):
         if timestep % 40 == 0:
 
             clusteredP = set()
             cluster2 = set()
-            actActNeig = {i:[] for i in range(nOfParticles)}
+            actActNeig = {i:[] for i in range(nOfRobots)}
 
-            pos = np.hstack((x[:, timestep].reshape((nOfParticles,1)), 
-                             y[:, timestep].reshape((nOfParticles,1))))
+            pos = np.hstack((x[:, timestep].reshape((nOfRobots,1)), 
+                             y[:, timestep].reshape((nOfRobots,1))))
 
-            for i in range(nOfParticles):
+            for i in range(nOfRobots):
 
                 r = pos[i] - pos 
                 # calculate the norm of every direction vector
-                rnorms = np.linalg.norm(r, axis=1).reshape((nOfParticles,1))
-                #actActNeig[i] = set([part for part in range(nOfParticles) if rnorms[part] < 4.1 * particle_radius])
+                rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
+                #actActNeig[i] = set([part for part in range(nOfRobots) if rnorms[part] < 4.1 * particle_radius])
 
-                cluster2 = cluster2.union({tuple(pos[j]) for j in range(nOfParticles) if rnorms[j] < 2.1*particle_radius and rnorms[j] > 0})
+                cluster2 = cluster2.union({tuple(pos[j]) for j in range(nOfRobots) if rnorms[j] < 2.1*particle_radius and rnorms[j] > 0})
 
 
             cluster2 = np.array(list(cluster2))
