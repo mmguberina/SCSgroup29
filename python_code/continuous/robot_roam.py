@@ -53,8 +53,10 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
         # check whether you're at the delivery station while you're at it
         v_hat2DelSt = v_hat2DeliveryStation(pos, \
                                     delivery_station, particle_radius).reshape((nOfRobots,2))
+        v_hat = np.array([v_hat[v] if robot_states[v]==0 else v_hat2DelSt[v] \
+                          for v in range(nOfRobots)]).reshape((nOfRobots,2))
         # check whether robots are the delivery station
-        isDone = (v_hat2DelSt == 0).all(axis=1)
+        isDone = (v_hat== 0).all(axis=1)
         robot_states = np.array([ 0 if isDone[i] else robot_states[i] \
                                 for i in range(nOfRobots)])
         # if yes empty their storage and change their state back to 0 (search)
@@ -65,8 +67,6 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
                 robot_storage[robo].clear()
         nOfCollectedItemsPerTime.append(nOfDelivered)
 
-        v_hat = np.array([v_hat[v] if robot_states[v]==0 else v_hat2DelSt[v] \
-                          for v in range(nOfRobots)]).reshape((nOfRobots,2))
 
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
 
@@ -118,7 +118,7 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
 
 
-nOfRobots = 30
+nOfRobots = 1
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -130,12 +130,12 @@ T = 50
 gridSize = 100
 torque0 = 1
 particle_radius = 1
-torque_radius = 3 * particle_radius
+torque_radius = 100 * particle_radius
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 2000
+N = 4000
 # Time step size
 dt = T/N
 # Initial values of x.
@@ -150,7 +150,8 @@ fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 
 
 # 5 items
-item_positions_list = np.fix(np.random.random((5, 2)) * gridSize)
+nOfItems = 10
+item_positions_list = np.fix(np.random.random((nOfItems, 2)) * gridSize)
 item_positions_set = set(map(tuple, item_positions_list))
 
 delivery_station = np.array([30,30])
@@ -164,7 +165,7 @@ camera = Camera(fig)
 s = (3*(ax.get_window_extent().width  / (gridSize+1.) * 72./fig.dpi) ** 2)
 
 # item_positions_list changes, you need to send a list of lists to know the changes
-visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime)
+visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, delivery_station)
 
 
 animation = camera.animate()

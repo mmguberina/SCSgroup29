@@ -7,7 +7,7 @@ def calcTorque(pos, robot_states, item_positions_list, v_hat, nOfRobots, nOfItem
     # calculate torque for each particle (single torque depends on all other particles) 
     robRobNeig = {i:[] for i in range(nOfRobots)}
     robItemNeig = {i:[] for i in range(nOfRobots)}
-    for i in range(1, nOfRobots):
+    for i in range(nOfRobots):
         # calculate direction vector to every vector ( r_i,i is not a thing tho)
         r = pos[i] - pos 
         r_item = pos[i] - item_positions_list
@@ -58,8 +58,9 @@ def v_hat2DeliveryStation(pos, delivery_station, particle_radius):
     rnorms = np.linalg.norm(rToDelivery, axis=1)
     isDone = rnorms < particle_radius
     v_hat2DeliveryStation = rToDelivery / rnorms.reshape((len(rToDelivery),1))
-    v_hat2DeliveryStation = np.array([v_hat2DeliveryStation[i] if isDone[i] \
-                                else [0,0] for i in range(len(rnorms))])
+
+    v_hat2DeliveryStation = np.array([ [0,0] if isDone[i] \
+                                else v_hat2DeliveryStation[i]for i in range(len(rnorms))])
     return v_hat2DeliveryStation
 
 
