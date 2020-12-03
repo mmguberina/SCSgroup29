@@ -16,7 +16,7 @@ def calcTorque(pos, robot_states, item_positions_list, v_hat, nOfRobots, nOfItem
         rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
         # collect only nearby ones
         robRobNeig[i] = [rob for rob in range(nOfRobots) if rnorms[rob] < 10 * particle_radius]
-        robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[rob] < 10 * particle_radius}
+        robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < 10 * particle_radius}
         # we need rhat
         if robot_states[i] == 1:
             torque[i] = 0
@@ -51,19 +51,23 @@ def calcTorque(pos, robot_states, item_positions_list, v_hat, nOfRobots, nOfItem
 
 
 
-# TODO return list of robots that are at the delivery station too
-def v_hat2DeliveryStation(pos, delivery_station):
+# return list of robots that are at the delivery station too
+# ==> just return 0,0 if they are
+def v_hat2DeliveryStation(pos, delivery_station, particle_radius):
     rToDelivery = delivery_station - pos
     rnorms = np.linalg.norm(rToDelivery, axis=1)
-    v_hat2DeliveryStation = rToDelivery / rnorms
+    isDone = rnorms < particle_radius
+    v_hat2DeliveryStation = rToDelivery / rnorms.reshape((len(rToDelivery),1))
+    v_hat2DeliveryStation = np.array([v_hat2DeliveryStation[i] if isDone[i] \
+                                else [0,0] for i in range(len(rnorms))])
     return v_hat2DeliveryStation
 
 
 # makes code cleaner, but i don't want these huge x's and y's sloshing around
 # test whether just references or whole objects are passed (most likely they are refs but check)
 def volumeExclusion(x,y, nOfRobots, particle_radius):
-        pos = np.hstack((x[:, step+1].reshape((nOfRobots,1)), 
-                         y[:, step+1].reshape((nOfRobots,1))))
+    pos = np.hstack((x[:, step+1].reshape((nOfRobots,1)), \
+                     y[:, step+1].reshape((nOfRobots,1))))
     for p in range(nOfRobots):
         r = pos[p] - pos 
         rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))

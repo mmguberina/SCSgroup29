@@ -3,13 +3,15 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from celluloid import Camera
 import matplotlib
-from calcTorque import *
+from movementFuns import *
 from visualize import *
 
 
 # to turn this into simple random motion, just don't add the torques (i.e. have only 
 # the random portion of fi change)
 def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, out=None):
+
+    nOfCollectedItemsPerTime = [0]
 
     item_positions_list = np.array(list(item_positions_set))
     nOfItems = len(item_positions_set)
@@ -46,11 +48,24 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
         v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfRobots,1))), 
                             np.sin(fi[:, step+1].reshape((nOfRobots,1)))))
 
-        # TODO check whether you're at the delivery station while you're at it
-        v_hat2DeliveryStation = v_hat2DeliveryStation(pos, \
-                                    delivery_station).reshape((nOfRobots,2))
+        
 
-        v_hat = np.array([v_hat[v] if robot_states[v]==0 else v_hat2DeliveryStation[v] \
+        # check whether you're at the delivery station while you're at it
+        v_hat2DelSt = v_hat2DeliveryStation(pos, \
+                                    delivery_station, particle_radius).reshape((nOfRobots,2))
+        # check whether robots are the delivery station
+        isDone = (v_hat2DelSt == 0).all(axis=1)
+        robot_states = np.array([ 0 if isDone[i] else robot_states[i] \
+                                for i in range(nOfRobots)])
+        # if yes empty their storage and change their state back to 0 (search)
+        nOfDelivered = nOfCollectedItemsPerTime[-1]
+        for robo in range(nOfRobots):
+            if isDone[robo]:
+                nOfDelivered += len(robot_storage[robo])
+                robot_storage[robo].clear()
+        nOfCollectedItemsPerTime.append(nOfDelivered)
+
+        v_hat = np.array([v_hat[v] if robot_states[v]==0 else v_hat2DelSt[v] \
                           for v in range(nOfRobots)]).reshape((nOfRobots,2))
 
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
@@ -71,8 +86,8 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
         for p in range(nOfRobots):
             r = pos[p] - pos 
             rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
-            r_item = pos[p] - item_positions_list
-            rnorms_item = np.linalg.norm(r_item, axis=1)
+            #r_item = pos[p] - item_positions_list
+            #rnorms_item = np.linalg.norm(r_item, axis=1)
             rnorms[p] = 'Inf'
             r_hat  = r / rnorms
 
@@ -88,13 +103,17 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
             
 # you'll need to somehow keep track of item changes so that they can be plotted in the simulation
             for n in robItemNeig[p]:
-                if rnorms_item[n] < 2 * particle_radius:
+                rnorm_item = np.linalg.norm(np.array(n) - pos[p])
+                if rnorm_item < 2 * particle_radius:
                     item_positions_set.remove(n)
+                    nOfItems -= 1
+                    if nOfItems == 0:
+                        return x, y, nOfCollectedItemsPerTime
                     item_positions_list = np.array(list(item_positions_set))
                     robot_storage[p].append(n)
                     robot_states[p] = 1
 
-    return x, y
+    return x, y, nOfCollectedItemsPerTime
 
 
 
@@ -136,7 +155,7 @@ item_positions_set = set(map(tuple, item_positions_list))
 
 delivery_station = np.array([30,30])
 
-x, y = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
+x, y, nOfCollectedItemsPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
 
 fig, ax = plt.subplots()
 ax.grid()
@@ -144,23 +163,10 @@ ax.grid()
 camera = Camera(fig)
 s = (3*(ax.get_window_extent().width  / (gridSize+1.) * 72./fig.dpi) ** 2)
 
-visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s)
+# item_positions_list changes, you need to send a list of lists to know the changes
+visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime)
 
 
-#plt.show()
-# Mark the start and end points.
-#ax.plot(x[0,0],x[1,0], 'go')
-#ax.plot(x[0,-1], x[1,-1], 'ro')
-#
-## More plot decorations.
-#ax.set_title('2D Brownian Motion')
-#ax.set_xlabel('x', fontsize=16)
-#ax.set_ylabel('y', fontsize=16)
-#ax.axis('equal')
-#t = np.linspace(0,T,int(T//dt))
-#msd = MSD(x, dt, T)
-#msd = calcMSDAvg(rot_dif_T, trans_dif_T, v, T, N)
-#ax.loglog(t, msd)
 animation = camera.animate()
 animation.save('robot_roam=' +str(ni)  +'.mp4')
 plt.show()
