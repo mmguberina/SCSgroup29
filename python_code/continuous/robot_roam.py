@@ -118,7 +118,7 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
 
 
-nOfRobots = 20
+nOfRobots = 2
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
