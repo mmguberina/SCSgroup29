@@ -124,10 +124,11 @@ nOfRobots = 20
 #v = 1
 nis= [np.pi *2, np.pi * 0.2, np.pi * 0.002]
 ni = nis[2] 
-v = 0.05
+#v = 0.05
+v = 0.5
 # Total time.
 T = 50
-gridSize = 100
+gridSize = 1000
 torque0 = 1
 particle_radius = 1
 torque_radius = 100 * particle_radius
