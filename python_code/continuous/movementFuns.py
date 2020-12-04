@@ -15,13 +15,9 @@ def calcTorque(pos, robot_states, item_positions_list, v_hat, nOfRobots, nOfItem
         rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
         rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
         # collect only nearby ones
-        robRobNeig[i] = [rob for rob in range(nOfRobots) if rnorms[rob] < 10 * particle_radius]
-        robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < 10 * particle_radius}
+        robRobNeig[i] = [rob for rob in range(nOfRobots) if rnorms[rob] < torque_radius]
+        robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < torque_radius}
         # we need rhat
-        if robot_states[i] == 1:
-            torque[i] = 0
-            torque_item[i] = 0
-            continue
         r_hat  = r / rnorms
         r_item_hat  = r_item / rnorms_item
         r_hat[i] = np.zeros(2)
@@ -47,7 +43,66 @@ def calcTorque(pos, robot_states, item_positions_list, v_hat, nOfRobots, nOfItem
         torque[i] = np.sum(particle_torques) 
         torque_item[i] = np.sum(particle_torques_item) 
 
+        if robot_states[i] == 1:
+            torque[i] = 0
+            torque_item[i] = 0
+            continue
+
     return torque, torque_item, robRobNeig, robItemNeig
+
+
+
+
+
+def calcForceAttractionRepulsion(pos, robot_states, item_positions_list, v_hat, nOfRobots, nOfItems, particle_radius, torque_radius):
+
+    force_rob = np.zeros((nOfRobots,2))
+    force_item = np.zeros((nOfRobots,2))
+    # calculate torque for each particle (single torque depends on all other particles) 
+    robRobNeig = {i:[] for i in range(nOfRobots)}
+    robItemNeig = {i:[] for i in range(nOfRobots)}
+    for i in range(nOfRobots):
+        # calculate direction vector to every vector ( r_i,i is not a thing tho)
+        r_rob = pos[i] - pos 
+        r_item = pos[i] - item_positions_list
+        # calculate the norm of every direction vector
+        rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobots,1))
+        rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
+        # collect only nearby ones
+        robRobNeig[i] = [rob for rob in range(nOfRobots) if rnorms_rob[rob] < torque_radius]
+        robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < torque_radius}
+        # we need rhat
+        r_rob_hat  = r_rob / rnorms_rob
+        r_item_hat  = r_item / rnorms_item
+        r_rob_hat[i] = np.zeros(2)
+        rnorms_rob[i] = 1
+
+        rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p]/5)**2 for p in range(nOfRobots) if rnorms_rob[p] < torque_radius])
+        item_forces = np.array([r_item_hat[p] / (rnorms_item[p]/5)**2 for p in range(nOfItems) if rnorms_item[p] < torque_radius])
+
+
+        if len(rob_forces) > 1:
+            #print(rob_forces)
+            force_rob[i] = np.sum(rob_forces, axis=0) 
+        else:
+            force_rob[i] = np.zeros(2)
+
+        if len(force_item) > 0:
+            #print(item_forces)
+            force_item[i] = np.sum(item_forces, axis=0) 
+        else:
+            force_item[i] = np.zeros(2)
+        
+        if robot_states[i] == 1:
+            force_rob[i] = 0
+            force_item[i] = 0
+            continue
+
+    return force_rob, force_item, robRobNeig, robItemNeig
+
+
+
+
 
 
 

@@ -9,7 +9,7 @@ from visualize import *
 
 # to turn this into simple random motion, just don't add the torques (i.e. have only 
 # the random portion of fi change)
-def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, out=None):
+def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0, out=None):
 
     nOfCollectedItemsPerTime = [[0,0]]
 
@@ -36,17 +36,20 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
 
         # the hw3 model is not good for this
-        torque, torque_item, robRobNeig, robItemNeig = calcTorque(pos, robot_states, 
+        force_rob, force_item, robRobNeig, robItemNeig = calcForceAttractionRepulsion(pos, robot_states, 
                 item_positions_list, v_hat, nOfRobots, nOfItems,
                 particle_radius, torque_radius)
 
-        torque = T0 * torque
-        torque_item = T0 * torque_item
-        fi[:, step+1] = fi[:, step] + torque_item.reshape((nOfRobots,)) \
-                            - torque.reshape((nOfRobots,)) \
-                            + randFactors.reshape((nOfRobots,))
+        #print(force_rob)
+        #print(force_item)
+        force_rob = FR0 * force_rob
+        force_item = FI0 * force_item 
 
-        v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfRobots,1))), 
+        fi[:, step+1] = fi[:, step] + randFactors.reshape((nOfRobots,))
+
+
+
+        v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfRobots,1))) , 
                             np.sin(fi[:, step+1].reshape((nOfRobots,1)))))
 
         
@@ -69,8 +72,8 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
 
-        x[:, step+1] = (x[:,step] +  v * v_hat[:,0]) % gridSize
-        y[:, step+1] = (y[:,step] +  v * v_hat[:,1]) % gridSize
+        x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0]) % gridSize
+        y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1]) % gridSize
 
         
         # we only need to exclude robots, items will most likely be picked up anyway
@@ -118,12 +121,12 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
 
 
-nOfRobots = 2
+nOfRobots = 5
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
 nis= [np.pi *2, np.pi * 0.2, np.pi * 0.002]
-ni = nis[2] 
+ni = nis[1] 
 #v = 0.05
 v = 0.5
 # Total time.
@@ -131,7 +134,9 @@ T = 50
 gridSize = 1000
 torque0 = 1
 particle_radius = 1
-torque_radius = 10 * particle_radius
+torque_radius = 50 * particle_radius
+FI0 = 10
+FR0 = 10
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
@@ -157,7 +162,7 @@ item_positions_set = set(map(tuple, item_positions_list))
 
 delivery_station = np.array([30,30])
 
-x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
+x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0)
 
 fig, ax = plt.subplots()
 ax.grid()
