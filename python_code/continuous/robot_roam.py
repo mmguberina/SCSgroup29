@@ -11,9 +11,10 @@ from visualize import *
 # the random portion of fi change)
 def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, out=None):
 
-    nOfCollectedItemsPerTime = [0]
+    nOfCollectedItemsPerTime = [[0,0]]
 
     item_positions_list = np.array(list(item_positions_set))
+    item_positions_listPerTime = [[0, item_positions_list]]
     nOfItems = len(item_positions_set)
     # 0 is search, 1 is delivering, 2 is ready to drop off item
     robot_states = np.zeros(nOfRobots)
@@ -60,12 +61,10 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
         robot_states = np.array([ 0 if isDone[i] else robot_states[i] \
                                 for i in range(nOfRobots)])
         # if yes empty their storage and change their state back to 0 (search)
-        nOfDelivered = nOfCollectedItemsPerTime[-1]
         for robo in range(nOfRobots):
             if isDone[robo]:
-                nOfDelivered += len(robot_storage[robo])
+                nOfCollectedItemsPerTime.append([step, nOfCollectedItemsPerTime[-1][1] + len(robot_storage[robo])])
                 robot_storage[robo].clear()
-        nOfCollectedItemsPerTime.append(nOfDelivered)
 
 
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
@@ -106,19 +105,20 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
                 rnorm_item = np.linalg.norm(np.array(n) - pos[p])
                 if rnorm_item < 2 * particle_radius:
                     item_positions_set.remove(n)
-                    nOfItems -= 1
-                    if nOfItems == 0:
-                        return x, y, nOfCollectedItemsPerTime
                     item_positions_list = np.array(list(item_positions_set))
+                    item_positions_listPerTime.append([step, item_positions_list])
+                    nOfItems -= 1
+                    if nOfItems == 1:
+                        return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
                     robot_storage[p].append(n)
                     robot_states[p] = 1
 
-    return x, y, nOfCollectedItemsPerTime
+    return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
 
 
 
 
-nOfRobots = 1
+nOfRobots = 20
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -135,7 +135,7 @@ torque_radius = 100 * particle_radius
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 4000
+N = 6000
 # Time step size
 dt = T/N
 # Initial values of x.
@@ -150,13 +150,13 @@ fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 
 
 # 5 items
-nOfItems = 10
+nOfItems = 50
 item_positions_list = np.fix(np.random.random((nOfItems, 2)) * gridSize)
 item_positions_set = set(map(tuple, item_positions_list))
 
 delivery_station = np.array([30,30])
 
-x, y, nOfCollectedItemsPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
+x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
 
 fig, ax = plt.subplots()
 ax.grid()
@@ -165,7 +165,7 @@ camera = Camera(fig)
 s = (3*(ax.get_window_extent().width  / (gridSize+1.) * 72./fig.dpi) ** 2)
 
 # item_positions_list changes, you need to send a list of lists to know the changes
-visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, delivery_station)
+visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station)
 
 
 animation = camera.animate()

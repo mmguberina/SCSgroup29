@@ -2,11 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from celluloid import Camera
 
-def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, delivery_station):
+def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station):
+    item_positions_listPerTime.reverse()
+    nOfCollectedItemsPerTime.reverse()
+    currently_collected = 0
 
     for timestep in range(N):
        # for i in range(nOfRobots):
         if timestep % 40 == 0:
+
+            if len(item_positions_listPerTime) > 0 and timestep >= item_positions_listPerTime[-1][0]:
+                item_positions = item_positions_listPerTime.pop()[1]
+
+            if len(nOfCollectedItemsPerTime) > 0 and timestep >= nOfCollectedItemsPerTime[-1][0]:
+                currently_collected = nOfCollectedItemsPerTime.pop()[1]
 
             clusteredP = set()
             cluster2 = set()
@@ -32,5 +41,5 @@ def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s
             ax.scatter(delivery_station[0], delivery_station[1], s=s, color='yellow')
             if len(cluster2 > 0):
                 ax.scatter(cluster2[:, 0], cluster2[:, 1], s=s, color='blue')
-            ax.set_title("thus far delivered: " + str(nOfCollectedItemsPerTime[timestep]))
+            ax.set_title("total delivered items: " + str(currently_collected))
             camera.snap()
