@@ -215,4 +215,4 @@ class Item:
     def position(self):
         return tuple(self.position)
     def __hash__(self):
-        return __hash__(tuple(self.position))
+        return hash(tuple(self.position))

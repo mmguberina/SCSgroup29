@@ -62,7 +62,7 @@ if __name__ == "__main__":
     attractionF = 2
     repulsionF = 2
 
-    warehouse = Warehouse(5, [20,30], 0.1, [10,10], visibilityRadius=visibilityRadius,
+    warehouse = Warehouse(10, [20,30], 0.1, [10,10], visibilityRadius=visibilityRadius,
             attractionF=attractionF, repulsionF=repulsionF)
 #    PSOlikeMovers(warehouse, ax, camera)
     randomMovers(warehouse, ax, camera)
