@@ -72,8 +72,10 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
 
-        x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0]) % gridSize
-        y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1]) % gridSize
+        #x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0]) % gridSize
+        #y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1]) % gridSize
+        x[:, step+1] = (x[:,step] +  v * v_hat[:,0] - force_item[:,0]) % gridSize
+        y[:, step+1] = (y[:,step] +  v * v_hat[:,1] - force_item[:,1]) % gridSize
 
         
         # we only need to exclude robots, items will most likely be picked up anyway
@@ -121,7 +123,7 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
 
 
-nOfRobots = 5
+nOfRobots = 50
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -133,8 +135,8 @@ v = 0.5
 T = 50
 gridSize = 1000
 torque0 = 1
-particle_radius = 1
-torque_radius = 50 * particle_radius
+particle_radius = 10
+torque_radius = 50 
 FI0 = 10
 FR0 = 10
 

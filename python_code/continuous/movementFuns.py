@@ -77,8 +77,8 @@ def calcForceAttractionRepulsion(pos, robot_states, item_positions_list, v_hat, 
         r_rob_hat[i] = np.zeros(2)
         rnorms_rob[i] = 1
 
-        rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p]/5)**2 for p in range(nOfRobots) if rnorms_rob[p] < torque_radius])
-        item_forces = np.array([r_item_hat[p] / (rnorms_item[p]/5)**2 for p in range(nOfItems) if rnorms_item[p] < torque_radius])
+        rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p])**2 for p in range(nOfRobots) if rnorms_rob[p] < torque_radius])
+        item_forces = np.array([r_item_hat[p] / (rnorms_item[p])**2 for p in range(nOfItems) if rnorms_item[p] < torque_radius])
 
 
         if len(rob_forces) > 1:
