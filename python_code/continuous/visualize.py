@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from celluloid import Camera
 
-def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, walls):
+def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station):
     item_positions_listPerTime.reverse()
     nOfCollectedItemsPerTime.reverse()
     currently_collected = 0

@@ -121,21 +121,33 @@ def v_hat2DeliveryStation(pos, delivery_station, particle_radius):
 
 # makes code cleaner, but i don't want these huge x's and y's sloshing around
 # test whether just references or whole objects are passed (most likely they are refs but check)
-def volumeExclusion(x,y, nOfRobots, particle_radius):
-    pos = np.hstack((x[:, step+1].reshape((nOfRobots,1)), \
-                     y[:, step+1].reshape((nOfRobots,1))))
+def volumeExclusion(x, y, pos, step, robRobNeig, particle_radius, nOfRobots):
+
     for p in range(nOfRobots):
         r = pos[p] - pos 
         rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
         rnorms[p] = 'Inf'
         r_hat  = r / rnorms
-
         for n in robRobNeig[p]:
             if rnorms[n] < 2 * particle_radius:
                 overlap = 2 * particle_radius - rnorms[n]
                 moveVec = r_hat[n] * (overlap / 2)
-#                    print(moveVec)
                 x[p, step+1] += moveVec[0]
                 y[p, step+1] += moveVec[1]
                 x[n, step+1] -= moveVec[0]
                 y[n, step+1] -= moveVec[1]
+
+
+def handleItems(x, y, step, robItemNeig, pos, robot_storage, robot_states, item_positions_set, item_positions_listPerTime, particle_radius, nOfRobots, nOfItems):
+    for p in range(nOfRobots):
+        for n in robItemNeig[p]:
+            rnorm_item = np.linalg.norm(np.array(n) - pos[p])
+            if rnorm_item < 2 * particle_radius:
+                item_positions_set.remove(n)
+                nOfItems -= 1
+                robot_storage[p].append(n)
+                robot_states[p] = 1
+
+                item_positions_list = np.array(list(item_positions_set))
+                item_positions_listPerTime.append([step, item_positions_list])
+    return np.array(list(item_positions_set)), nOfItems
