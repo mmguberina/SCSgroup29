@@ -12,10 +12,10 @@ from visualize import *
 def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0, out=None):
 
     nOfCollectedItemsPerTime = [[0,0]]
-
     item_positions_list = np.array(list(item_positions_set))
     item_positions_listPerTime = [[0, item_positions_list]]
     nOfItems = len(item_positions_set)
+
     # 0 is search, 1 is delivering, 2 is ready to drop off item
     robot_states = np.zeros(nOfRobots)
     robot_storage = {rob:[] for rob in range(nOfRobots)}
@@ -30,15 +30,13 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
         # this already is vhat 'cos sin^2(x) + cos^2(x) = 1
         v_hat = np.hstack((np.cos(fi[:, step]) .reshape((nOfRobots,1)), 
                             np.sin(fi[:, step]).reshape((nOfRobots,1))))
-        # init torque
-        torque = np.zeros((nOfRobots,1))
-        torque_item = np.zeros((nOfRobots,1))
 
+        # get nbhds
+        robRobNeig, robItemNeig = getNeighbourhoods(pos, item_positions_list, 
+                nOfRobots, nOfItems, particle_radius, torque_radius)
 
         # the hw3 model is not good for this
-        force_rob, force_item, robRobNeig, robItemNeig = calcForceAttractionRepulsion(pos, robot_states, 
-                item_positions_list, v_hat, nOfRobots, nOfItems,
-                particle_radius, torque_radius)
+        force_rob, force_item = calcForceAttractionRepulsion(pos, robot_states,robRobNeig, robItemNeig, v_hat, nOfRobots, nOfItems)
 
         #print(force_rob)
         #print(force_item)
@@ -72,10 +70,10 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
 
-        #x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0]) % gridSize
-        #y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1]) % gridSize
-        x[:, step+1] = (x[:,step] +  v * v_hat[:,0] - force_item[:,0]) % gridSize
-        y[:, step+1] = (y[:,step] +  v * v_hat[:,1] - force_item[:,1]) % gridSize
+        x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0]) % gridSize
+        y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1]) % gridSize
+        #x[:, step+1] = (x[:,step] +  v * v_hat[:,0] - force_item[:,0]) % gridSize
+        #y[:, step+1] = (y[:,step] +  v * v_hat[:,1] - force_item[:,1]) % gridSize
 
         
         # we only need to exclude robots, items will most likely be picked up anyway
@@ -83,47 +81,25 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
                          y[:, step+1].reshape((nOfRobots,1))))
 
 
-        
-
-        # volume exclusion
-        # and item picking while we're at it
-        for p in range(nOfRobots):
-            r = pos[p] - pos 
-            rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
-            #r_item = pos[p] - item_positions_list
-            #rnorms_item = np.linalg.norm(r_item, axis=1)
-            rnorms[p] = 'Inf'
-            r_hat  = r / rnorms
-
-            for n in robRobNeig[p]:
-                if rnorms[n] < 2 * particle_radius:
-                    overlap = 2 * particle_radius - rnorms[n]
-                    moveVec = r_hat[n] * (overlap / 2)
-#                    print(moveVec)
-                    x[p, step+1] += moveVec[0]
-                    y[p, step+1] += moveVec[1]
-                    x[n, step+1] -= moveVec[0]
-                    y[n, step+1] -= moveVec[1]
+        # here we'll pass by reference (but in the pytonic way)
+        # esentially this means that volume exclusion will update the x and y array
+        # which exists as the code is running, i.e. they won't be copied when entering to 
+        # the function
+        # think of this function as simply having the code put in another place, not
+        # really a function with inputs and outputs
+        volumeExclusion(x, y, pos, step, robRobNeig, particle_radius, nOfRobots)
             
-# you'll need to somehow keep track of item changes so that they can be plotted in the simulation
-            for n in robItemNeig[p]:
-                rnorm_item = np.linalg.norm(np.array(n) - pos[p])
-                if rnorm_item < 2 * particle_radius:
-                    item_positions_set.remove(n)
-                    item_positions_list = np.array(list(item_positions_set))
-                    item_positions_listPerTime.append([step, item_positions_list])
-                    nOfItems -= 1
-                    if nOfItems == 1:
-                        return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
-                    robot_storage[p].append(n)
-                    robot_states[p] = 1
+        item_positions_list, nOfItems = handleItems(x, y, step, robItemNeig, pos, robot_storage, 
+            robot_states, item_positions_set, item_positions_listPerTime, particle_radius, nOfRobots, nOfItems)
+
+        
 
     return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
 
 
 
 
-nOfRobots = 50
+nOfRobots = 5
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -158,11 +134,11 @@ fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 
 
 # 5 items
-nOfItems = 50
+nOfItems = 10
 item_positions_list = np.fix(np.random.random((nOfItems, 2)) * gridSize)
 item_positions_set = set(map(tuple, item_positions_list))
 
-delivery_station = np.array([30,30])
+delivery_station = np.array([50,50])
 
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0)
 
