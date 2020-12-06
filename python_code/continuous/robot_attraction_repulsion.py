@@ -133,7 +133,7 @@ fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 
 
 # 5 items
-nOfItems = 10
+nOfItems = 50
 
 percetangeOfCoverage = 0.01
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius)
@@ -153,7 +153,7 @@ camera = Camera(fig)
 s = (3*(ax.get_window_extent().width  / (gridSize+1.) * 72./fig.dpi) ** 2)
 
 # item_positions_list changes, you need to send a list of lists to know the changes
-visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles)
+visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius)
 
 
 animation = camera.animate()

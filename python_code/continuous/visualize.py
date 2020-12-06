@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from celluloid import Camera
+from matplotlib.patches import Circle
+from matplotlib.collections import PatchCollection
 
-def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, walls):
+def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius):
     item_positions_listPerTime.reverse()
     nOfCollectedItemsPerTime.reverse()
     currently_collected = 0
@@ -42,10 +44,21 @@ def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s
             ax.scatter(item_positions[:, 0], item_positions[:, 1], s=s, color='green')
             #ax.scatter(item_positions[:, 0], item_positions[:, 1], color='green')
             ax.scatter(delivery_station[0], delivery_station[1], s=s, color='yellow')
-            ax.scatter(walls[:,0], walls[:,1], s=s, color='black')
-            #ax.scatter(delivery_station[0], delivery_station[1], color='yellow')
+
+            # paint blue if clustered
             if len(cluster2 > 0):
                 ax.scatter(cluster2[:, 0], cluster2[:, 1], s=s, color='blue')
+
+            # do obstacles
+            obstacle_patches = []
+            for obstacle in obstacles:
+                circle = Circle(tuple(obstacle), obstacleRadius, color='black')
+                obstacle_patches.append(circle)
+            p = PatchCollection(obstacle_patches)
+            ax.add_collection(p)
+            ax.axis('scaled')
+
+            #ax.scatter(walls[:,0], walls[:,1], s=s, color='black')
                 #ax.scatter(cluster2[:, 0], cluster2[:, 1], color='blue')
             ax.set_title("total delivered items: " + str(currently_collected))
             camera.snap()
