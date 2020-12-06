@@ -1,0 +1,40 @@
+###################################################
+the plan
+###################################################
+
+high-level
+----------
+1. be done with boring bullshit
+2. make code easily customizable (mostly mentally, but also keystrokewise)
+	======> because unreadable code will remain unread and nothing will get done
+3. implement all reasonable algorithms (the benchmarks too, but that's not a priority rn)
+4. put all of them in various situations (various sizes, n of items, floor layouts etc)
+5. reasses the situation again
+
+
+
+more specific
+-------------
+1. finalize the environment:
+	---> create the outer and inner walls (via variuos functions)
+	---> generate new goals on the fly
+
+1&2. clean up the code - divide everything into functions,
+   prioritize customizability (thus also clarity):
+	--> have a function that extracts neighbourhoods for every robot
+	--> then have functions that generate x,y,fi,force,torque, whatever per robot
+	--> combine this at the end
+	======> separate as much as possible, show into other files as much as possible
+
+3.	a) random brownian
+	b) random levy
+	c) attraction-repulsion via artifial potential field
+	d) combinations of above
+		===> try to formalize behaviour as state machine swithing between modes 
+			 based on various criteria
+		===> you can then also optimize the switching thresholds with the GA
+
+4. do both warehouse and truffle searching and whatever. have random env, changing env, sparse, dense,...
+
+5. hope to god this happens soon and shit works
+
