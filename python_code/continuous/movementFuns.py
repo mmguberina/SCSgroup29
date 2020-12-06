@@ -1,29 +1,31 @@
 import numpy as np
 
 # TODO
-# this needs to be changed so that walls block vision, i.e. remove items which they are in front of
+# this needs to be changed so that obss block vision, i.e. remove items which they are in front of
 # this will involve doing some geometry
-def getNeighbourhoods(pos, item_positions_list, nOfRobots, nOfItems, particle_radius, torque_radius, walls):
-    nOfWalls = len(walls)
+# or just make obstacles big lel hack
+def getNeighbourhoods(pos, item_positions_list, nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius):
+    nOfObss = len(obstacles)
     robRobNeig = {i:[] for i in range(nOfRobots)}
     robItemNeig = {i:[] for i in range(nOfRobots)}
-    robWallNeig = {i:[] for i in range(nOfRobots)}
+    robObsNeig = {i:[] for i in range(nOfRobots)}
     for i in range(nOfRobots):
         # calculate direction vector to every vector ( r_i,i is not a thing tho)
         r_rob = pos[i] - pos 
         r_item = pos[i] - item_positions_list
-        r_wall  = pos[i] - walls
+        r_obs  = pos[i] - obstacles
         # calculate the norm of every direction vector
         rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobots,1))
         rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
-        rnorms_wall = np.linalg.norm(r_wall, axis=1).reshape((nOfWalls,1))
+        rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObss,1))
 
         # form neighbourhoods 
         robRobNeig[i] = {rob for rob in range(nOfRobots) 
                 if rnorms_rob[rob] < torque_radius and rob != i}
         robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < torque_radius}
-        robWallNeig[i] = {tuple(walls[w]) for w in range(nOfWalls) if rnorms_wall[w] < torque_radius}
-    return robRobNeig, robItemNeig, robWallNeig
+        robObsNeig[i] = {tuple(obstacles[o]) for o in range(nOfObss) 
+                if rnorms_obs[o] - obstacleRadius < torque_radius}
+    return robRobNeig, robItemNeig, robObsNeig
 
 
 
@@ -82,17 +84,17 @@ def calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig, v_hat, nOfRo
 
 
 
-def calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, robWallNeig, v_hat, nOfRobots, nOfItems):
+def calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, robObsNeig, v_hat, nOfRobots, nOfItems, obstacleRadius):
 
     force_rob = np.zeros((nOfRobots,2))
     force_item = np.zeros((nOfRobots,2))
-    force_wall = np.zeros((nOfRobots,2))
+    force_obs = np.zeros((nOfRobots,2))
     # calculate torque for each particle based on nbhd 
     for i in range(nOfRobots):
 
         nOfRobotsInNeigh = len(robRobNeig[i])
         nOfItemsInNeigh = len(robItemNeig[i])
-        nOfWallsInNeigh = len(robWallNeig[i])
+        nOfObssInNeigh = len(robObsNeig[i])
 
         if nOfRobotsInNeigh == 0:
             force_rob[i] = np.zeros(2)
@@ -115,16 +117,16 @@ def calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, rob
             force_item[i] = np.sum(item_forces) 
 
 
-        if nOfWallsInNeigh == 0:
-            force_wall[i] = np.zeros(2)
+        if nOfObssInNeigh == 0:
+            force_obs[i] = np.zeros(2)
         else:
-            r_wall = pos[i] - np.array(list(map(list, robWallNeig[i])))
-            rnorms_wall = np.linalg.norm(r_wall, axis=1).reshape((nOfWallsInNeigh,1))
-            r_wall_hat  = r_wall / rnorms_wall
-            wall_forces = np.array([r_wall_hat[p] / (rnorms_wall[p])**2 for p in range(nOfWallsInNeigh)])
-            force_wall[i] = np.sum(wall_forces) 
+            r_obs = pos[i] - np.array(list(map(list, robObsNeig[i])))
+            rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObssInNeigh,1))
+            r_obs_hat  = r_obs / rnorms_obs
+            obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius)**2 for p in range(nOfObssInNeigh)])
+            force_obs[i] = np.sum(obs_forces) 
 
-    return force_rob, force_item, force_wall
+    return force_rob, force_item, force_obs
 
 
 
@@ -147,7 +149,7 @@ def v_hat2DeliveryStation(pos, delivery_station, particle_radius):
 
 # makes code cleaner, but i don't want these huge x's and y's sloshing around
 # test whether just references or whole objects are passed (most likely they are refs but check)
-def volumeExclusion(x, y, pos, step, robRobNeig, robWallNeig, particle_radius, nOfRobots):
+def volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nOfRobots, obstacleRadius):
 
     for p in range(nOfRobots):
         if len(robRobNeig[p]) == 0:
@@ -168,15 +170,15 @@ def volumeExclusion(x, y, pos, step, robRobNeig, robWallNeig, particle_radius, n
 
     # you can change the radius of barriers if you feel like it
     for p in range(nOfRobots):
-        if len(robWallNeig[p]) == 0:
+        if len(robObsNeig[p]) == 0:
             continue
-        robWallNeigList = np.array(list(robWallNeig[p]))
-        r = pos[p] - robWallNeigList
-        rnorms = np.linalg.norm(r, axis=1).reshape((len(robWallNeigList),1))
+        robObsNeigList = np.array(list(robObsNeig[p]))
+        r = pos[p] - robObsNeigList
+        rnorms = np.linalg.norm(r, axis=1).reshape((len(robObsNeigList),1))
         r_hat  = r / rnorms
-        for n in range(len(robWallNeigList)):
-            if rnorms[n] < 2 * particle_radius:
-                overlap = 2 * particle_radius - rnorms[n]
+        for n in range(len(robObsNeigList)):
+            if rnorms[n] < particle_radius + obstacleRadius:
+                overlap = particle_radius + obstacleRadius - rnorms[n]
                 moveVec = r_hat[n] * (overlap)
                 x[p, step+1] += moveVec[0]
                 y[p, step+1] += moveVec[1]
