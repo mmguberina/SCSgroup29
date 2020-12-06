@@ -5,8 +5,6 @@ the plan
 high-level
 ----------
 1. be done with boring bullshit
-2. make code easily customizable (mostly mentally, but also keystrokewise)
-	======> because unreadable code will remain unread and nothing will get done
 3. implement all reasonable algorithms (the benchmarks too, but that's not a priority rn)
 4. put all of them in various situations (various sizes, n of items, floor layouts etc)
 5. reasses the situation again
@@ -17,14 +15,13 @@ more specific
 -------------
 1. finalize the environment:
 	---> create the outer and inner walls (via variuos functions)
-	---> generate new goals on the fly
+	---> generate new goals on the fly.
+thing is, these walls will have to do the following:
+1) be impassable (which also needs to be dealt with when initializing)
+2) block vision. this would not be a problem in a proper simulation environment,
+   but here we'll need to deal with that manually
+3) generate artificial force fields which leads to them being avoided
 
-1&2. clean up the code - divide everything into functions,
-   prioritize customizability (thus also clarity):
-	--> have a function that extracts neighbourhoods for every robot
-	--> then have functions that generate x,y,fi,force,torque, whatever per robot
-	--> combine this at the end
-	======> separate as much as possible, show into other files as much as possible
 
 3.	a) random brownian
 	b) random levy
