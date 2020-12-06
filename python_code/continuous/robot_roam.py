@@ -35,15 +35,18 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
                             np.sin(fi[:, step]).reshape((nOfRobots,1))))
 
         # calculate torques 
-        torque, torque_item, robRobNeig, robItemNeig = calcTorque(pos, robot_states, 
-                item_positions_list, v_hat, nOfRobots, nOfItems,
-                particle_radius, torque_radius)
-        torque = T0 * torque
+        robRobNeig, robItemNeig = getNeighbourhoods(pos, item_positions_list, 
+                nOfRobots, nOfItems, particle_radius, torque_radius)
+
+
+        torque_rob, torque_item = calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig,                               v_hat, nOfRobots, nOfItems)
+
+        torque_rob = T0 * torque_rob
         torque_item = T0 * torque_item
 
         # update the orientation
         fi[:, step+1] = fi[:, step] + torque_item.reshape((nOfRobots,)) \
-                            - torque.reshape((nOfRobots,)) \
+                            - torque_rob.reshape((nOfRobots,)) \
                             + randFactors.reshape((nOfRobots,))
 
         # calculate the velocities according to random walking
@@ -96,12 +99,12 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
 
 
 
-nOfRobots = 20
+nOfRobots = 10
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
-nis= [np.pi *2, np.pi * 0.2, np.pi * 0.002]
-ni = nis[2] 
+nis= [np.pi *2, np.pi * 0.02, np.pi * 0.002]
+ni = nis[1] 
 #v = 0.05
 v = 0.5
 # Total time.
@@ -127,13 +130,14 @@ fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 
 
 # 5 items
-nOfItems = 50
+nOfItems = 5
 item_positions_list = np.fix(np.random.random((nOfItems, 2)) * gridSize)
 item_positions_set = set(map(tuple, item_positions_list))
 
 delivery_station = np.array([500,500])
 
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
+
 
 fig, ax = plt.subplots()
 ax.grid()

@@ -1,5 +1,79 @@
 import numpy as np
 
+def getNeighbourhoods(pos, item_positions_list, nOfRobots, nOfItems, particle_radius, torque_radius):
+    robRobNeig = {i:[] for i in range(nOfRobots)}
+    robItemNeig = {i:[] for i in range(nOfRobots)}
+    for i in range(nOfRobots):
+        # calculate direction vector to every vector ( r_i,i is not a thing tho)
+        r = pos[i] - pos 
+        r_item = pos[i] - item_positions_list
+        # calculate the norm of every direction vector
+        rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
+        rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
+        # form neighbourhoods 
+        robRobNeig[i] = {rob for rob in range(nOfRobots) 
+                if rnorms[rob] < torque_radius and rob != i}
+        robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < torque_radius}
+    return robRobNeig, robItemNeig
+
+
+
+
+def calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig, v_hat, nOfRobots, nOfItems):
+
+    torque_rob = np.zeros((nOfRobots,1))
+    torque_item = np.zeros((nOfRobots,1))
+    # calculate torque for each particle (single torque depends on all other particles) 
+    for i in range(nOfRobots):
+
+        # if robot state is != 0 then there is no effect
+        if robot_states[i] != 0:
+            torque_rob[i] = 0
+            torque_item[i] = 0
+            continue
+
+        nOfRobotsInNeigh = len(robRobNeig[i])
+        nOfItemsInNeigh = len(robItemNeig[i])
+
+        if nOfRobotsInNeigh == 0:
+            torque_rob[i] = 0
+        else:
+            pos_neighbs = np.array([pos[n] for n in robRobNeig[i]]) if nOfRobotsInNeigh > 0 else 0
+            r_rob = pos[i] - pos_neighbs
+            rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobotsInNeigh,1))
+            r_rob_hat  = r_rob / rnorms_rob
+            dots_rob = np.sum(v_hat[i] * r_rob_hat, axis=1).reshape((nOfRobotsInNeigh,1))
+            coefs = dots_rob / rnorms_rob**2 
+            crosses = np.cross(v_hat[i], r_rob_hat).reshape((nOfRobotsInNeigh, 1))
+            particle_torques = coefs * crosses
+            torque_rob[i] = np.sum(particle_torques) 
+
+        if nOfItemsInNeigh == 0:
+            torque_item[i] = 0
+        else:
+            # calculate direction vector to things in neighbourhood
+            r_item = pos[i] - np.array(list(map(list, robItemNeig[i])))
+            # calculate the norm of every direction vector
+            rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItemsInNeigh,1))
+            # collect only nearby ones
+            # we need rhat
+            r_item_hat  = r_item / rnorms_item
+            # dot 'em. dot does not support axis thing so we do it like this 
+            dots_item = np.sum(v_hat[i] * r_item_hat, axis=1).reshape((nOfItemsInNeigh,1))
+            coefs_item = dots_item / rnorms_item**2 
+            # try repelling them now
+            # crosses v_i with r_i and does so for all i
+            crosses_item = np.cross(v_hat[i], r_item_hat).reshape((nOfItemsInNeigh, 1))
+            particle_torques_item = coefs_item * crosses_item
+
+            torque_item[i] = np.sum(particle_torques_item) 
+
+
+    return torque_rob, torque_item
+
+
+
+
 def calcTorque(pos, robot_states, item_positions_list, v_hat, nOfRobots, nOfItems, particle_radius, torque_radius):
 
     torque = np.zeros((nOfRobots,1))
