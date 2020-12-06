@@ -9,7 +9,7 @@ from visualize import *
 
 # to turn this into simple random motion, just don't add the torques (i.e. have only 
 # the random portion of fi change)
-def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0, out=None):
+def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0, FW0, walls, out=None):
 
     nOfCollectedItemsPerTime = [[0,0]]
     item_positions_list = np.array(list(item_positions_set))
@@ -32,25 +32,22 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
                             np.sin(fi[:, step]).reshape((nOfRobots,1))))
 
         # get nbhds
-        robRobNeig, robItemNeig = getNeighbourhoods(pos, item_positions_list, 
-                nOfRobots, nOfItems, particle_radius, torque_radius)
+        robRobNeig, robItemNeig, robWallNeig = getNeighbourhoods(pos, item_positions_list, 
+                nOfRobots, nOfItems, particle_radius, torque_radius, walls)
 
         # the hw3 model is not good for this
-        force_rob, force_item = calcForceAttractionRepulsion(pos, robot_states,robRobNeig, robItemNeig, v_hat, nOfRobots, nOfItems)
+        force_rob, force_item, force_wall = calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, robWallNeig,  v_hat, nOfRobots, nOfItems)
 
         #print(force_rob)
         #print(force_item)
         force_rob = FR0 * force_rob
         force_item = FI0 * force_item 
+        force_wall = FW0 * force_wall
 
         fi[:, step+1] = fi[:, step] + randFactors.reshape((nOfRobots,))
 
-
-
         v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfRobots,1))) , 
                             np.sin(fi[:, step+1].reshape((nOfRobots,1)))))
-
-        
 
         # check whether you're at the delivery station while you're at it
         v_hat2DelSt = v_hat2DeliveryStation(pos, \
@@ -70,8 +67,8 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
 
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
 
-        x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0]) % gridSize
-        y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1]) % gridSize
+        x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0] + force_wall[:,0]) % gridSize
+        y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1] + force_wall[:,1]) % gridSize
         #x[:, step+1] = (x[:,step] +  v * v_hat[:,0] - force_item[:,0]) % gridSize
         #y[:, step+1] = (y[:,step] +  v * v_hat[:,1] - force_item[:,1]) % gridSize
 
@@ -87,7 +84,7 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, dt, T0, nO
         # the function
         # think of this function as simply having the code put in another place, not
         # really a function with inputs and outputs
-        volumeExclusion(x, y, pos, step, robRobNeig, particle_radius, nOfRobots)
+        volumeExclusion(x, y, pos, step, robRobNeig, robWallNeig, particle_radius, nOfRobots)
             
         item_positions_list, nOfItems = handleItems(x, y, step, robItemNeig, pos, robot_storage, 
             robot_states, item_positions_set, item_positions_listPerTime, particle_radius, nOfRobots, nOfItems)
@@ -106,7 +103,7 @@ nOfRobots = 5
 nis= [np.pi *2, np.pi * 0.2, np.pi * 0.002]
 ni = nis[1] 
 #v = 0.05
-v = 0.5
+v = 0.3
 # Total time.
 T = 50
 gridSize = 1000
@@ -115,6 +112,7 @@ particle_radius = 10
 torque_radius = 50 
 FI0 = 10
 FR0 = 10
+FW0 = 10
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
@@ -138,9 +136,12 @@ nOfItems = 10
 item_positions_list = np.fix(np.random.random((nOfItems, 2)) * gridSize)
 item_positions_set = set(map(tuple, item_positions_list))
 
-delivery_station = np.array([50,50])
+delivery_station = np.array([500,500])
 
-x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0)
+walls = np.array([[i, 400] for i in range(100,900)])
+
+x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, dt, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, 
+    particle_radius, torque_radius, FR0, FI0, FW0, walls)
 
 fig, ax = plt.subplots()
 ax.grid()
@@ -149,7 +150,7 @@ camera = Camera(fig)
 s = (3*(ax.get_window_extent().width  / (gridSize+1.) * 72./fig.dpi) ** 2)
 
 # item_positions_list changes, you need to send a list of lists to know the changes
-visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station)
+visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, walls)
 
 
 animation = camera.animate()
