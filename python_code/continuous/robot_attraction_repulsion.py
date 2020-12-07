@@ -18,7 +18,7 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
     item_positions_listPerTime = [[0, item_positions_list]]
     nOfItems = len(item_positions_set)
 
-    # 0 is search, 1 is delivering, 2 is ready to drop off item
+    # 0 is search, 1 is delivering, 2 is going to pick up a spotted item
     robot_states = np.zeros(nOfRobots)
     robot_storage = {rob:[] for rob in range(nOfRobots)}
     for step in range(n):
@@ -38,7 +38,7 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
                 nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius)
 
         # the hw3 model is not good for this
-        force_rob, force_item, force_obs = calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, robObsNeig,  v_hat, nOfRobots, nOfItems, obstacleRadius)
+        force_rob, force_item, force_obs = calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, robObsNeig,  v_hat, nOfRobots, nOfItems, particle_radius, obstacleRadius)
 
         #print(force_rob)
         #print(force_item)
@@ -51,20 +51,40 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
         v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfRobots,1))) , 
                             np.sin(fi[:, step+1].reshape((nOfRobots,1)))))
 
+        # TODO MAKE THIS CLEANER!!
         # check whether you're at the delivery station while you're at it
+        # combine it all into a single for loop so that the states are consistent!!!
         v_hat2DelSt = v_hat2DeliveryStation(pos, \
                                     delivery_station, particle_radius).reshape((nOfRobots,2))
         v_hat = np.array([v_hat[v] if robot_states[v]==0 else v_hat2DelSt[v] \
                           for v in range(nOfRobots)]).reshape((nOfRobots,2))
         # check whether robots are the delivery station
+        # if yes empty their storage and change their state back to 0 (search)
         isDone = (v_hat== 0).all(axis=1)
         robot_states = np.array([ 0 if isDone[i] else robot_states[i] \
                                 for i in range(nOfRobots)])
-        # if yes empty their storage and change their state back to 0 (search)
         for robo in range(nOfRobots):
             if isDone[robo]:
                 nOfCollectedItemsPerTime.append([step, nOfCollectedItemsPerTime[-1][1] + len(robot_storage[robo])])
                 robot_storage[robo].clear()
+
+        # TODO make this thing work!!!!!!!!!!!!!1
+        # check if they got items in their visibility sphere
+#        robsWithNearItems = v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots)
+#        # returns either vector (ndarray) to item or tuple denoting item position if it has been picked up
+#        for robo in robsWithNearItems:
+#            if type(robsWithNearItems[robo]) == tuple:
+#                robot_storage[robo].append(robsWithNearItems[robo])
+#                item_positions_set.remove(robsWithNearItems[robo])
+#                nOfItems -= 1
+#                robot_states[robo] = 1
+#
+#                item_positions_list = np.array(list(item_positions_set))
+#                item_positions_listPerTime.append([step, item_positions_list])
+#            else:
+#                v_hat[robo] = robsWithNearItems[robo]
+#                robot_states[robo] = 2
+
 
 
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
@@ -111,18 +131,18 @@ v = 0.3
 # Total time.
 T = 50
 obstacleRadius = 30
-gridSize = 5000
+gridSize = 1000
 torque0 = 1
 particle_radius = 5
 torque_radius = 100 
-FI0 = 10
+FI0 = 1
 FR0 = 10
 FW0 = 1
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 7000
+N = 4000
 # Initial values of x.
 # you should init this to sth other than 0
 x = np.zeros((1 * nOfRobots,N+1))

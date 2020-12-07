@@ -84,7 +84,7 @@ def calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig, v_hat, nOfRo
 
 
 
-def calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, robObsNeig, v_hat, nOfRobots, nOfItems, obstacleRadius):
+def calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, robObsNeig, v_hat, nOfRobots, nOfItems, particle_radius, obstacleRadius):
 
     force_rob = np.zeros((nOfRobots,2))
     force_item = np.zeros((nOfRobots,2))
@@ -103,8 +103,9 @@ def calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, 
             r_rob = pos[i] - pos_neighbs
             rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobotsInNeigh,1))
             r_rob_hat  = r_rob / rnorms_rob
-            rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p])**2 for p in range(nOfRobotsInNeigh)])
+            rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p] - particle_radius)**2 for p in range(nOfRobotsInNeigh)])
             force =  np.sum(rob_forces) 
+            # it works because it's per element
             force_rob[i] = force if np.abs(force) < v else 0.05 * np.sign(force)
 
 
@@ -148,6 +149,27 @@ def v_hat2DeliveryStation(pos, delivery_station, particle_radius):
     v_hat2DeliveryStation = np.array([ [0,0] if isDone[i] \
                                 else v_hat2DeliveryStation[i]for i in range(len(rnorms))])
     return v_hat2DeliveryStation
+
+# go to the closest item
+def v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots):
+    robsWithNearItems = {}
+    for i in range(nOfRobots):
+        nOfItemsInNeigh = len(robItemNeig[i])
+        if  nOfItemsInNeigh == 0:
+            continue
+        nearItemsList = np.array(list(map(list, robItemNeig[i])))
+        r_item = pos[i] - nearItemsList
+        rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItemsInNeigh,1))
+        # sort by index to get the one you want
+        closest = np.argsort(rnorms_item)
+        r_closest_hat  = r_item[closest] / rnorms_item[closest]
+        isDone = rnorms_item[closest] < particle_radius
+        v_hat2Item = r_closest_hat
+
+        # if done give me the item position, else give me the vector pointing towards the item
+        robsWithNearItems[i] = tuple(nearItemsList[closest]) if isDone else v_hat2Item
+
+    return robsWithNearItems
 
 
 # makes code cleaner, but i don't want these huge x's and y's sloshing around

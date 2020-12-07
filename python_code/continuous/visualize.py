@@ -68,6 +68,7 @@ def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s
                     ax.add_patch(circle)
 
             circle = Circle(tuple(delivery_station), particle_radius, facecolor='yellow', edgecolor='black')
+            ax.add_patch(circle)
 
             ax.axis('scaled')
 
