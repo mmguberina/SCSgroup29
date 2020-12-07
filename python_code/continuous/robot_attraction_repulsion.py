@@ -54,36 +54,33 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
         # TODO MAKE THIS CLEANER!!
         # check whether you're at the delivery station while you're at it
         # combine it all into a single for loop so that the states are consistent!!!
-        v_hat2DelSt = v_hat2DeliveryStation(pos, \
-                                    delivery_station, particle_radius).reshape((nOfRobots,2))
-        v_hat = np.array([v_hat[v] if robot_states[v]==0 else v_hat2DelSt[v] \
-                          for v in range(nOfRobots)]).reshape((nOfRobots,2))
-        # check whether robots are the delivery station
-        # if yes empty their storage and change their state back to 0 (search)
-        isDone = (v_hat== 0).all(axis=1)
-        robot_states = np.array([ 0 if isDone[i] else robot_states[i] \
-                                for i in range(nOfRobots)])
-        for robo in range(nOfRobots):
-            if isDone[robo]:
+        v_hats2DelSt = v_hat2DeliveryStationFromState(pos, delivery_station, particle_radius, robot_states, nOfRobots)
+        for robo in v_hats2DelSt:
+            isDone = (v_hats2DelSt[robo] == 0).all()
+            if isDone:
                 nOfCollectedItemsPerTime.append([step, nOfCollectedItemsPerTime[-1][1] + len(robot_storage[robo])])
                 robot_storage[robo].clear()
+                robot_states[robo] = 0
+            else:
+                v_hat[robo] = v_hats2DelSt[robo]
 
         # TODO make this thing work!!!!!!!!!!!!!1
         # check if they got items in their visibility sphere
-#        robsWithNearItems = v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots)
+        robsWithNearItems = v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots, robot_states)
 #        # returns either vector (ndarray) to item or tuple denoting item position if it has been picked up
-#        for robo in robsWithNearItems:
-#            if type(robsWithNearItems[robo]) == tuple:
-#                robot_storage[robo].append(robsWithNearItems[robo])
-#                item_positions_set.remove(robsWithNearItems[robo])
-#                nOfItems -= 1
-#                robot_states[robo] = 1
-#
-#                item_positions_list = np.array(list(item_positions_set))
-#                item_positions_listPerTime.append([step, item_positions_list])
-#            else:
-#                v_hat[robo] = robsWithNearItems[robo]
-#                robot_states[robo] = 2
+        for robo in robsWithNearItems:
+            #print(robsWithNearItems[robo])
+            if type(robsWithNearItems[robo]) == tuple:
+                robot_storage[robo].append(robsWithNearItems[robo])
+                item_positions_set.remove(robsWithNearItems[robo])
+                nOfItems -= 1
+                robot_states[robo] = 1
+
+                item_positions_list = np.array(list(item_positions_set))
+                item_positions_listPerTime.append([step, item_positions_list])
+            else:
+                v_hat[robo] = robsWithNearItems[robo]
+                robot_states[robo] = 2
 
 
 
@@ -110,8 +107,8 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
         # really a function with inputs and outputs
         volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nOfRobots, obstacleRadius)
             
-        item_positions_list, nOfItems = handleItems(x, y, step, robItemNeig, pos, robot_storage, 
-            robot_states, item_positions_set, item_positions_listPerTime, particle_radius, nOfRobots, nOfItems)
+#        item_positions_list, nOfItems = handleItems(x, y, step, robItemNeig, pos, robot_storage, 
+#            robot_states, item_positions_set, item_positions_listPerTime, particle_radius, nOfRobots, nOfItems)
 
         
 
@@ -127,9 +124,8 @@ nOfRobots = 20
 nis= [np.pi *2, np.pi * 0.2, np.pi * 0.002]
 ni = nis[-1] 
 #v = 0.05
-v = 0.3
+v = 0.1
 # Total time.
-T = 50
 obstacleRadius = 30
 gridSize = 1000
 torque0 = 1
@@ -142,7 +138,7 @@ FW0 = 1
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 4000
+N = 14000
 # Initial values of x.
 # you should init this to sth other than 0
 x = np.zeros((1 * nOfRobots,N+1))
@@ -157,12 +153,12 @@ fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 
 
 # 5 items
-nOfItems = 15
+nOfItems = 50
 
 percetangeOfCoverage = 0.01
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius)
 
-item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize)
+item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles)
 
 delivery_station = np.array([500,500])
 

@@ -150,25 +150,50 @@ def v_hat2DeliveryStation(pos, delivery_station, particle_radius):
                                 else v_hat2DeliveryStation[i]for i in range(len(rnorms))])
     return v_hat2DeliveryStation
 
+
+def v_hat2DeliveryStationFromState(pos, delivery_station, particle_radius, robot_states, nOfRobots):
+    v_hat2DeliveryStation = {}
+    for i in range(nOfRobots):
+        if robot_states[i] != 1:
+            continue
+        rToDelivery = delivery_station - pos[i]
+        rnorms = np.linalg.norm(rToDelivery)
+        isDone = rnorms < particle_radius
+        v_hat = rToDelivery / rnorms
+        
+        # zeros means it's done
+        v_hat2DeliveryStation[i] = np.zeros(2) if isDone else v_hat
+    return v_hat2DeliveryStation
+
 # go to the closest item
-def v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots):
+def v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots, robot_states):
     robsWithNearItems = {}
     for i in range(nOfRobots):
         nOfItemsInNeigh = len(robItemNeig[i])
+        # this does not interest you if you're delivering
+        if robot_states[i] == 1:
+            continue
         if  nOfItemsInNeigh == 0:
             continue
         nearItemsList = np.array(list(map(list, robItemNeig[i])))
-        r_item = pos[i] - nearItemsList
-        rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItemsInNeigh,1))
+        #print("################")
+        #print(nearItemsList)
+        r_item = nearItemsList - pos[i] 
+        #print(r_item)
+        rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItemsInNeigh,))
         # sort by index to get the one you want
-        closest = np.argsort(rnorms_item)
+        closest = np.argsort(rnorms_item)[0]
+        #print(rnorms_item)
+        #print(np.argsort(rnorms_item))
+        #print(closest)
         r_closest_hat  = r_item[closest] / rnorms_item[closest]
         isDone = rnorms_item[closest] < particle_radius
         v_hat2Item = r_closest_hat
 
         # if done give me the item position, else give me the vector pointing towards the item
+        #print(nearItemsList[closest])
+        #print(tuple(nearItemsList[closest]))
         robsWithNearItems[i] = tuple(nearItemsList[closest]) if isDone else v_hat2Item
-
     return robsWithNearItems
 
 
