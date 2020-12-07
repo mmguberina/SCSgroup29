@@ -4,9 +4,8 @@ import numpy as np
 def initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius):
     coveredArea = gridSize**2 * percetangeOfCoverage
     nOfObstacles = int(coveredArea / obstacleRadius / 5)
-    print(nOfObstacles)
 
-    return np.fix(np.random.random((nOfObstacles, 2)) * gridSize)
+    return np.fix(np.random.random((500, 2)) * gridSize)
     
 
 def initializeItems(nOfItems, gridSize):

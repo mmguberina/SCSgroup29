@@ -38,7 +38,7 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
                 nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius)
 
         # the hw3 model is not good for this
-        force_rob, force_item, force_obs = calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, robObsNeig,  v_hat, nOfRobots, nOfItems, obstacleRadius)
+        force_rob, force_item, force_obs = calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, robObsNeig,  v_hat, nOfRobots, nOfItems, obstacleRadius)
 
         #print(force_rob)
         #print(force_item)
@@ -70,7 +70,9 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
         # if the robot is in the delivery state, v_hat is the direction to the delivery station
 
         x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0] + force_obs[:,0]) % gridSize
+        #x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0] ) % gridSize
         y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1] + force_obs[:,1]) % gridSize
+        #y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1] ) % gridSize
         #x[:, step+1] = (x[:,step] +  v * v_hat[:,0] - force_item[:,0]) % gridSize
         #y[:, step+1] = (y[:,step] +  v * v_hat[:,1] - force_item[:,1]) % gridSize
 
@@ -98,21 +100,21 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
 
 
 
-nOfRobots = 5
+nOfRobots = 20
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
 nis= [np.pi *2, np.pi * 0.2, np.pi * 0.002]
-ni = nis[1] 
+ni = nis[-1] 
 #v = 0.05
 v = 0.3
 # Total time.
 T = 50
 obstacleRadius = 30
-gridSize = 1000
+gridSize = 5000
 torque0 = 1
-particle_radius = 10
-torque_radius = 50 
+particle_radius = 5
+torque_radius = 100 
 FI0 = 10
 FR0 = 10
 FW0 = 1
@@ -120,20 +122,22 @@ FW0 = 1
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 6000
+N = 7000
 # Initial values of x.
 # you should init this to sth other than 0
 x = np.zeros((1 * nOfRobots,N+1))
-x[:,0] = np.random.random(nOfRobots) * gridSize
+#x[:,0] = np.random.random(nOfRobots) * gridSize
+x[:,0] = 2 * np.random.random(nOfRobots) - 1 + 500
 y = np.zeros((1 * nOfRobots,N+1))
-y[:,0] = np.random.random(nOfRobots) * gridSize
+#y[:,0] = np.random.random(nOfRobots) * gridSize
+y[:,0] = 2 * np.random.random(nOfRobots) - 1 + 500
 fi = np.zeros((1 * nOfRobots,N+1))
 fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 #x[:, 0] = 0.0
 
 
 # 5 items
-nOfItems = 50
+nOfItems = 15
 
 percetangeOfCoverage = 0.01
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius)
@@ -153,7 +157,7 @@ camera = Camera(fig)
 s = (3*(ax.get_window_extent().width  / (gridSize+1.) * 72./fig.dpi) ** 2)
 
 # item_positions_list changes, you need to send a list of lists to know the changes
-visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius)
+visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
 
 
 animation = camera.animate()

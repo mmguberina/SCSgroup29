@@ -84,7 +84,7 @@ def calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig, v_hat, nOfRo
 
 
 
-def calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, robObsNeig, v_hat, nOfRobots, nOfItems, obstacleRadius):
+def calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, robObsNeig, v_hat, nOfRobots, nOfItems, obstacleRadius):
 
     force_rob = np.zeros((nOfRobots,2))
     force_item = np.zeros((nOfRobots,2))
@@ -104,7 +104,8 @@ def calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, rob
             rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobotsInNeigh,1))
             r_rob_hat  = r_rob / rnorms_rob
             rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p])**2 for p in range(nOfRobotsInNeigh)])
-            force_rob[i] = np.sum(rob_forces) 
+            force =  np.sum(rob_forces) 
+            force_rob[i] = force if np.abs(force) < v else 0.05 * np.sign(force)
 
 
         if nOfItemsInNeigh == 0:
@@ -114,7 +115,8 @@ def calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, rob
             rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItemsInNeigh,1))
             r_item_hat  = r_item / rnorms_item
             item_forces = np.array([r_item_hat[p] / (rnorms_item[p])**2 for p in range(nOfItemsInNeigh)])
-            force_item[i] = np.sum(item_forces) 
+            force =  np.sum(item_forces) 
+            force_item[i] = force if np.abs(force) < v else v * np.sign(force)
 
 
         if nOfObssInNeigh == 0:
@@ -124,7 +126,8 @@ def calcForceAttractionRepulsion(pos, robot_states, robRobNeig, robItemNeig, rob
             rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObssInNeigh,1))
             r_obs_hat  = r_obs / rnorms_obs
             obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius)**2 for p in range(nOfObssInNeigh)])
-            force_obs[i] = np.sum(obs_forces) 
+            force =  np.sum(obs_forces) 
+            force_obs[i] = force if np.abs(force) < v else v * np.sign(force)
 
     return force_rob, force_item, force_obs
 
