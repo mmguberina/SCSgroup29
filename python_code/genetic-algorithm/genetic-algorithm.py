@@ -1,12 +1,7 @@
-#### implement genetic algorithm
-## to figure out:
-# loop a certain amount of generations?
-# what seletion?
-
 import numpy as np
 
-# init
 def geneticAlgo(chromosomeLength, populationSize, generations, mutationParameter, selectionParameter):
+    # some initializations
     m = chromosomeLength
     n = populationSize
     population = np.random.randint(0, 2, size=(m,n))
@@ -16,19 +11,23 @@ def geneticAlgo(chromosomeLength, populationSize, generations, mutationParameter
     maxfitness = 0
     bestIndividual = np.zeros((m,))
 
+    # find best individual in initial population
     for i in range(n):
-
         currIndividual = population[:,i]
         fitness[i] = evaluateIndividual(currIndividual)
         if fitness[i] > maxfitness:
             maxfitness = fitness[i]
             bestIndividual = np.array(currIndividual)
+
     print("Initial best: ")
     print(str(bestIndividual) + ", with fitness " + str(maxfitness))
+
+
     for generation in range(generations):
+        # reinitialize with np.array since I had a problem where they treated tempPop and pop as the same object, dunno if we need to do this everywhere?
         tempPopulation = np.array(population)
 
-        # evaluate individuals
+        # evaluate individuals, find best
         for i in range(n):
             fitness[i] = evaluateIndividual(population[:,i])
             if fitness[i] > maxfitness:
@@ -37,12 +36,10 @@ def geneticAlgo(chromosomeLength, populationSize, generations, mutationParameter
                 bestIndividual = population[:,i]
                 print(str(bestIndividual) + ", with fitness " + str(maxfitness))
 
+        # tournament selection + crossover
         for i in range(n):
-            # tournament selection
             ind1 = selectIndividual(fitness, selectionParameter)
             ind2 = selectIndividual(fitness, selectionParameter)
-
-            # crossover
             tempPopulation[:,i] = crossover(population[:,ind1], population[:,ind2])
 
         # mutate
@@ -53,40 +50,42 @@ def geneticAlgo(chromosomeLength, populationSize, generations, mutationParameter
         tempPopulation[:,0] = bestIndividual
         population = np.array(tempPopulation)
 
+    # due to elitism, the first object is always the best
     return(population[:,0])
 
 
 
 def evaluateIndividual(individual):
-    # i.e. decode individual into parameter values, call robot roam with the values
+    # TODO: figure out actual function to use
+    # decode individual into parameter values, call robot roam with the values
     decodedIndividual = decode(individual)
 
+    # currently got a random temporary function
     crossPoint = int(np.floor(len(individual)/2))
     fitness = sum(individual[:crossPoint]) - sum(individual[crossPoint:])
     return(fitness)
 
 def decode(individual):
     # TODO: figure out encoding
-    # inputs to activeSwimmers:
-    # x, y, fi, item_positions_set, delivery_station, n, dt, T0, nOfRobots, ni, v,
-    # trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, out=None
-
     # probably parameters for attraction-repulsion
     # when to change between states "random-walk", "go-straight-to-item", "stuck"
     return(0)
 
 def mutate(individual, mutationParameter):
+    # mutates the individual with probability mutationparameter
     m = len(individual)
+
     toMutate = np.where(np.random.rand(m) < mutationParameter)
+
     mutated = np.array(individual)
-    mutated[toMutate] = 1 - mutated[toMutate]
-    testMut = np.zeros(individual.shape)
-    for i in range(len(individual)):
-        testMut[i] = individual[i]
+    mutated[toMutate] = 1 - mutated[toMutate] # assuming binary encoding
     return(mutated)
 
 def crossover(individual1, individual2):
+    # creates new individual from the two individuals. this is done by simple concatination of two lists, with crossoverpoint chosen randomly
     crossOver = np.random.randint(len(individual1))
+
+    # hstack handles the concatination
     newIndividual = np.hstack((individual1[:crossOver], individual2[crossOver:]))
     return(newIndividual)
 
