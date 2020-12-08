@@ -4,7 +4,7 @@ from scipy.stats import norm
 from celluloid import Camera
 import matplotlib
 from movementFuns import *
-from visualize import *
+from animate import *
 
 
 # to turn this into simple random motion, just don't add the torques (i.e. have only 

@@ -4,7 +4,7 @@ from scipy.stats import norm
 from celluloid import Camera
 import matplotlib
 from movementFuns import *
-from visualize import *
+from animate import *
 from environments import *
 
 
@@ -38,22 +38,26 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
                 nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius)
 
         # the hw3 model is not good for this
-        force_rob, force_item, force_obs = calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, robObsNeig,  v_hat, nOfRobots, nOfItems, particle_radius, obstacleRadius)
+        force_rob = calcForceRob(v, pos, robot_states, robRobNeig, v_hat, nOfRobots, particle_radius)
 
-        #print(force_rob)
-        #print(force_item)
+        force_item = calcForceItem(v, pos, robot_states, robItemNeig, v_hat, nOfRobots, nOfItems, particle_radius)
+
+        force_obs = calcForceObs(v, pos, robot_states, robObsNeig,  v_hat, nOfRobots, nOfItems, particle_radius, obstacleRadius)
+
         force_rob = FR0 * force_rob
         force_item = FI0 * force_item 
-        force_obs = FW0 * force_obs
+        #force_obs = FW0 * force_obs
+
+        torque_obs = calcTorqueObs(pos, robot_states, robObsNeig, v_hat, nOfRobots)
 
         fi[:, step+1] = fi[:, step] + randFactors.reshape((nOfRobots,))
+        fi[:, step+1] = fi[:, step+1] + torque_obs
 
         v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfRobots,1))) , 
                             np.sin(fi[:, step+1].reshape((nOfRobots,1)))))
 
-        # TODO MAKE THIS CLEANER!!
-        # check whether you're at the delivery station while you're at it
-        # combine it all into a single for loop so that the states are consistent!!!
+        
+
         v_hats2DelSt = v_hat2DeliveryStationFromState(pos, delivery_station, particle_radius, robot_states, nOfRobots)
         for robo in v_hats2DelSt:
             isDone = (v_hats2DelSt[robo] == 0).all()
@@ -64,8 +68,7 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
             else:
                 v_hat[robo] = v_hats2DelSt[robo]
 
-        # TODO make this thing work!!!!!!!!!!!!!1
-        # check if they got items in their visibility sphere
+        
         robsWithNearItems = v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots, robot_states)
 #        # returns either vector (ndarray) to item or tuple denoting item position if it has been picked up
         for robo in robsWithNearItems:
@@ -84,17 +87,21 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
 
 
 
-        # if the robot is in the delivery state, v_hat is the direction to the delivery station
+# make this be chosen by some nice ifs because you will be tweaking it a lot
 
-        x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0] + force_obs[:,0]) % gridSize
-        #x[:, step+1] = (x[:,step] +  v * v_hat[:,0]+ force_rob[:,0] - force_item[:,0] ) % gridSize
-        y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1] + force_obs[:,1]) % gridSize
-        #y[:, step+1] = (y[:,step] +  v * v_hat[:,1] + force_rob[:,1] - force_item[:,1] ) % gridSize
-        #x[:, step+1] = (x[:,step] +  v * v_hat[:,0] - force_item[:,0]) % gridSize
-        #y[:, step+1] = (y[:,step] +  v * v_hat[:,1] - force_item[:,1]) % gridSize
+        x[:, step+1] = x[:,step] +  v * v_hat[:,0]
+        x[:, step+1] = x[:, step+1] + force_rob[:,0] 
+        x[:, step+1] = x[:, step+1] - force_item[:,0] 
+        #x[:, step+1] = x[:, step+1] + force_obs[:,0] 
+        x[:, step+1] = x[:, step+1] % gridSize
+        y[:, step+1] = y[:,step] +  v * v_hat[:,1] 
+        y[:, step+1] = y[:,step+1] + force_rob[:,1] 
+        y[:, step+1] = y[:,step+1] - force_item[:,1] 
+        y[:, step+1] = y[:,step+1] + force_obs[:,1] 
+        y[:, step+1] = y[:,step+1] % gridSize
 
         
-        # we only need to exclude robots, items will most likely be picked up anyway
+        # we only need to exclude robots
         pos = np.hstack((x[:, step+1].reshape((nOfRobots,1)), 
                          y[:, step+1].reshape((nOfRobots,1))))
 
@@ -107,11 +114,6 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
         # really a function with inputs and outputs
         volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nOfRobots, obstacleRadius)
             
-#        item_positions_list, nOfItems = handleItems(x, y, step, robItemNeig, pos, robot_storage, 
-#            robot_states, item_positions_set, item_positions_listPerTime, particle_radius, nOfRobots, nOfItems)
-
-        
-
     return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
 
 
@@ -124,7 +126,7 @@ nOfRobots = 20
 nis= [np.pi *2, np.pi * 0.2, np.pi * 0.002]
 ni = nis[-1] 
 #v = 0.05
-v = 0.1
+v = 0.3
 # Total time.
 obstacleRadius = 30
 gridSize = 1000
@@ -138,7 +140,7 @@ FW0 = 1
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 14000
+N = 15000
 # Initial values of x.
 # you should init this to sth other than 0
 x = np.zeros((1 * nOfRobots,N+1))
@@ -153,14 +155,16 @@ fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 
 
 # 5 items
-nOfItems = 50
+nOfItems = 15
 
 percetangeOfCoverage = 0.01
-obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius)
-
-item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles)
-
 delivery_station = np.array([500,500])
+# they must no cover the delivery station
+obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
+
+# no overla between items and obstacles!
+item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
+
 
 
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, 

@@ -29,22 +29,16 @@ def getNeighbourhoods(pos, item_positions_list, nOfRobots, nOfItems, particle_ra
 
 
 
+def calcTorqueRob(pos, robot_states, robRobNeig, v_hat, nOfRobots):
+    torque_rob = np.zeros(nOfRobots)
 
-def calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig, v_hat, nOfRobots, nOfItems):
-
-    torque_rob = np.zeros((nOfRobots,1))
-    torque_item = np.zeros((nOfRobots,1))
-    # calculate torque for each particle based on nbhd
     for i in range(nOfRobots):
-
         # if robot state is != 0 then there is no effect
         if robot_states[i] != 0:
             torque_rob[i] = 0
-            torque_item[i] = 0
             continue
 
         nOfRobotsInNeigh = len(robRobNeig[i])
-        nOfItemsInNeigh = len(robItemNeig[i])
 
         if nOfRobotsInNeigh == 0:
             torque_rob[i] = 0
@@ -58,6 +52,23 @@ def calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig, v_hat, nOfRo
             crosses = np.cross(v_hat[i], r_rob_hat).reshape((nOfRobotsInNeigh, 1))
             particle_torques = coefs * crosses
             torque_rob[i] = np.sum(particle_torques) 
+
+    return torque_rob
+
+
+
+
+def calcTorqueItem(pos, robot_states, robItemNeig, v_hat, nOfRobots, nOfItems):
+
+    torque_item = np.zeros(nOfRobots)
+    # calculate torque for each particle based on nbhd
+    for i in range(nOfRobots):
+        # if robot state is != 0 then there is no effect
+        if robot_states[i] != 0:
+            torque_item[i] = 0
+            continue
+
+        nOfItemsInNeigh = len(robItemNeig[i])
 
         if nOfItemsInNeigh == 0:
             torque_item[i] = 0
@@ -79,22 +90,48 @@ def calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig, v_hat, nOfRo
 
             torque_item[i] = np.sum(particle_torques_item) 
 
-
-    return torque_rob, torque_item
-
+    return torque_item
 
 
-def calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, robObsNeig, v_hat, nOfRobots, nOfItems, particle_radius, obstacleRadius):
+
+def calcTorqueObs(pos, robot_states, robObsNeig, v_hat, nOfRobots):
+
+    torque_obs = np.zeros(nOfRobots)
+    # calculate torque for each particle based on nbhd
+    for i in range(nOfRobots):
+        # if robot state is != 0 then there is no effect
+        nOfObssInNeigh = len(robObsNeig[i])
+
+        if nOfObssInNeigh == 0:
+            torque_obs[i] = 0
+            continue
+        # calculate direction vector to things in neighbourhood
+        r_obs = pos[i] - np.array(list(map(list, robObsNeig[i])))
+        # calculate the norm of every direction vector
+        rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObssInNeigh,1))
+        # collect only nearby ones
+        # we need rhat
+        r_obs_hat  = r_obs / rnorms_obs
+        # dot 'em. dot does not support axis thing so we do it like this 
+        dots_obs = np.sum(v_hat[i] * r_obs_hat, axis=1).reshape((nOfObssInNeigh,1))
+        coefs_obs = dots_obs / rnorms_obs**2 
+        # try repelling them now
+        # crosses v_i with r_i and does so for all i
+        crosses_obs = np.cross(v_hat[i], r_obs_hat).reshape((nOfObssInNeigh, 1))
+        particle_torques_obs = coefs_obs * crosses_obs
+
+        torque_obs[i] = np.sum(particle_torques_obs) 
+
+    return torque_obs
+
+
+
+
+def calcForceRob(v, pos, robot_states, robRobNeig, v_hat, nOfRobots, particle_radius):
 
     force_rob = np.zeros((nOfRobots,2))
-    force_item = np.zeros((nOfRobots,2))
-    force_obs = np.zeros((nOfRobots,2))
-    # calculate torque for each particle based on nbhd 
     for i in range(nOfRobots):
-
         nOfRobotsInNeigh = len(robRobNeig[i])
-        nOfItemsInNeigh = len(robItemNeig[i])
-        nOfObssInNeigh = len(robObsNeig[i])
 
         if nOfRobotsInNeigh == 0:
             force_rob[i] = np.zeros(2)
@@ -108,7 +145,16 @@ def calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, 
             # it works because it's per element
             force_rob[i] = force if np.abs(force) < v else 0.05 * np.sign(force)
 
+    return force_rob
 
+
+
+
+def calcForceItem(v, pos, robot_states, robItemNeig, v_hat, nOfRobots, nOfItems, particle_radius):
+
+    force_item = np.zeros((nOfRobots,2))
+    for i in range(nOfRobots):
+        nOfItemsInNeigh = len(robItemNeig[i])
         if nOfItemsInNeigh == 0:
             force_item[i] = np.zeros(2)
         else:
@@ -119,7 +165,16 @@ def calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, 
             force =  np.sum(item_forces) 
             force_item[i] = force if np.abs(force) < v else v * np.sign(force)
 
+    return force_item
 
+
+
+
+def calcForceObs(v, pos, robot_states, robObsNeig, v_hat, nOfRobots, nOfItems, particle_radius, obstacleRadius):
+
+    force_obs = np.zeros((nOfRobots,2))
+    for i in range(nOfRobots):
+        nOfObssInNeigh = len(robObsNeig[i])
         if nOfObssInNeigh == 0:
             force_obs[i] = np.zeros(2)
         else:
@@ -130,27 +185,12 @@ def calcForceAttractionRepulsion(v, pos, robot_states, robRobNeig, robItemNeig, 
             force =  np.sum(obs_forces) 
             force_obs[i] = force if np.abs(force) < v else v * np.sign(force)
 
-    return force_rob, force_item, force_obs
+    return force_obs
 
 
 
 
-
-
-
-# return list of robots that are at the delivery station too
-# ==> just return 0,0 if they are
-def v_hat2DeliveryStation(pos, delivery_station, particle_radius):
-    rToDelivery = delivery_station - pos
-    rnorms = np.linalg.norm(rToDelivery, axis=1)
-    isDone = rnorms < particle_radius
-    v_hat2DeliveryStation = rToDelivery / rnorms.reshape((len(rToDelivery),1))
-
-    v_hat2DeliveryStation = np.array([ [0,0] if isDone[i] \
-                                else v_hat2DeliveryStation[i]for i in range(len(rnorms))])
-    return v_hat2DeliveryStation
-
-
+# go to delivery station if you're in state 1
 def v_hat2DeliveryStationFromState(pos, delivery_station, particle_radius, robot_states, nOfRobots):
     v_hat2DeliveryStation = {}
     for i in range(nOfRobots):
@@ -165,7 +205,10 @@ def v_hat2DeliveryStationFromState(pos, delivery_station, particle_radius, robot
         v_hat2DeliveryStation[i] = np.zeros(2) if isDone else v_hat
     return v_hat2DeliveryStation
 
-# go to the closest item
+
+
+
+# go to the closest item if you're in state 2
 def v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots, robot_states):
     robsWithNearItems = {}
     for i in range(nOfRobots):
@@ -176,29 +219,20 @@ def v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots, robot_states):
         if  nOfItemsInNeigh == 0:
             continue
         nearItemsList = np.array(list(map(list, robItemNeig[i])))
-        #print("################")
-        #print(nearItemsList)
         r_item = nearItemsList - pos[i] 
-        #print(r_item)
         rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItemsInNeigh,))
         # sort by index to get the one you want
         closest = np.argsort(rnorms_item)[0]
-        #print(rnorms_item)
-        #print(np.argsort(rnorms_item))
-        #print(closest)
         r_closest_hat  = r_item[closest] / rnorms_item[closest]
         isDone = rnorms_item[closest] < particle_radius
         v_hat2Item = r_closest_hat
 
         # if done give me the item position, else give me the vector pointing towards the item
-        #print(nearItemsList[closest])
-        #print(tuple(nearItemsList[closest]))
         robsWithNearItems[i] = tuple(nearItemsList[closest]) if isDone else v_hat2Item
     return robsWithNearItems
 
 
-# makes code cleaner, but i don't want these huge x's and y's sloshing around
-# test whether just references or whole objects are passed (most likely they are refs but check)
+
 def volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nOfRobots, obstacleRadius):
 
     for p in range(nOfRobots):
@@ -234,16 +268,53 @@ def volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nO
                 y[p, step+1] += moveVec[1]
 
 
-def handleItems(x, y, step, robItemNeig, pos, robot_storage, robot_states, item_positions_set, item_positions_listPerTime, particle_radius, nOfRobots, nOfItems):
-    for p in range(nOfRobots):
-        for n in robItemNeig[p]:
-            rnorm_item = np.linalg.norm(np.array(n) - pos[p])
-            if rnorm_item < 2 * particle_radius:
-                item_positions_set.remove(n)
-                nOfItems -= 1
-                robot_storage[p].append(n)
-                robot_states[p] = 1
-
-                item_positions_list = np.array(list(item_positions_set))
-                item_positions_listPerTime.append([step, item_positions_list])
-    return np.array(list(item_positions_set)), nOfItems
+#def calcTorqueFromNeigh(pos, robot_states, robRobNeig, robItemNeig, v_hat, nOfRobots, nOfItems):
+#
+#    torque_rob = np.zeros((nOfRobots,1))
+#    torque_item = np.zeros((nOfRobots,1))
+#    # calculate torque for each particle based on nbhd
+#    for i in range(nOfRobots):
+#
+#        # if robot state is != 0 then there is no effect
+#        if robot_states[i] != 0:
+#            torque_rob[i] = 0
+#            torque_item[i] = 0
+#            continue
+#
+#        nOfRobotsInNeigh = len(robRobNeig[i])
+#        nOfItemsInNeigh = len(robItemNeig[i])
+#
+#        if nOfRobotsInNeigh == 0:
+#            torque_rob[i] = 0
+#        else:
+#            pos_neighbs = np.array([pos[n] for n in robRobNeig[i]]) if nOfRobotsInNeigh > 0 else 0
+#            r_rob = pos[i] - pos_neighbs
+#            rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobotsInNeigh,1))
+#            r_rob_hat  = r_rob / rnorms_rob
+#            dots_rob = np.sum(v_hat[i] * r_rob_hat, axis=1).reshape((nOfRobotsInNeigh,1))
+#            coefs = dots_rob / rnorms_rob**2 
+#            crosses = np.cross(v_hat[i], r_rob_hat).reshape((nOfRobotsInNeigh, 1))
+#            particle_torques = coefs * crosses
+#            torque_rob[i] = np.sum(particle_torques) 
+#
+#        if nOfItemsInNeigh == 0:
+#            torque_item[i] = 0
+#        else:
+#            # calculate direction vector to things in neighbourhood
+#            r_item = pos[i] - np.array(list(map(list, robItemNeig[i])))
+#            # calculate the norm of every direction vector
+#            rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItemsInNeigh,1))
+#            # collect only nearby ones
+#            # we need rhat
+#            r_item_hat  = r_item / rnorms_item
+#            # dot 'em. dot does not support axis thing so we do it like this 
+#            dots_item = np.sum(v_hat[i] * r_item_hat, axis=1).reshape((nOfItemsInNeigh,1))
+#            coefs_item = dots_item / rnorms_item**2 
+#            # try repelling them now
+#            # crosses v_i with r_i and does so for all i
+#            crosses_item = np.cross(v_hat[i], r_item_hat).reshape((nOfItemsInNeigh, 1))
+#            particle_torques_item = coefs_item * crosses_item
+#
+#            torque_item[i] = np.sum(particle_torques_item) 
+#
+#    return torque_rob, torque_item
