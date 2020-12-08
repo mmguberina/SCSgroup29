@@ -94,7 +94,7 @@ def calcTorqueItem(pos, robot_states, robItemNeig, v_hat, nOfRobots, nOfItems):
 
 
 
-def calcTorqueObs(pos, robot_states, robObsNeig, v_hat, nOfRobots):
+def calcTorqueObs(pos, robot_states, robObsNeig, v_hat, nOfRobots, obstacleRadius):
 
     torque_obs = np.zeros(nOfRobots)
     # calculate torque for each particle based on nbhd
@@ -108,7 +108,8 @@ def calcTorqueObs(pos, robot_states, robObsNeig, v_hat, nOfRobots):
         # calculate direction vector to things in neighbourhood
         r_obs = pos[i] - np.array(list(map(list, robObsNeig[i])))
         # calculate the norm of every direction vector
-        rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObssInNeigh,1))
+        # the robot will never get inside the obstacle so minus it to have reasonable forces
+        rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObssInNeigh,1)) - obstacleRadius
         # collect only nearby ones
         # we need rhat
         r_obs_hat  = r_obs / rnorms_obs
@@ -140,7 +141,9 @@ def calcForceRob(v, pos, robot_states, robRobNeig, v_hat, nOfRobots, particle_ra
             r_rob = pos[i] - pos_neighbs
             rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobotsInNeigh,1))
             r_rob_hat  = r_rob / rnorms_rob
-            rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p] - particle_radius)**2 for p in range(nOfRobotsInNeigh)])
+            #rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p] - particle_radius)**2 for p in range(nOfRobotsInNeigh)])
+            # trying it without the square 'cos it seemed way too small
+            rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p] - particle_radius) for p in range(nOfRobotsInNeigh)])
             force =  np.sum(rob_forces) 
             # it works because it's per element
             force_rob[i] = force if np.abs(force) < v else 0.05 * np.sign(force)
