@@ -4,7 +4,7 @@ from celluloid import Camera
 from matplotlib.patches import Circle
 from matplotlib.collections import PatchCollection
 
-def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius):
+def visualise(x, y, robot_statesPerTime, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius):
     item_positions_listPerTime.reverse()
     nOfCollectedItemsPerTime.reverse()
     currently_collected = 0
@@ -27,36 +27,30 @@ def visualise(x, y, item_positions, N, nOfRobots, particle_radius, ax, camera, s
                              y[:, timestep].reshape((nOfRobots,1))))
 
             for i in range(nOfRobots):
-
                 r = pos[i] - pos 
-                # calculate the norm of every direction vector
                 rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
-
                 cluster2 = cluster2.union({tuple(pos[j]) for j in range(nOfRobots) if rnorms[j] < 2.1*particle_radius and rnorms[j] > 0})
 
-
-            #cluster2 = np.array(list(cluster2))
-
-            #ax.scatter(x[:, timestep], y[:, timestep], s=s, color='red')
-            #ax.scatter(x[:, timestep], y[:, timestep], color='red')
-            #ax.scatter(item_positions[:, 0], item_positions[:, 1], s=s, color='green')
-            #ax.scatter(item_positions[:, 0], item_positions[:, 1], color='green')
-            #ax.scatter(delivery_station[0], delivery_station[1], s=s, color='yellow')
-
-            # paint blue if clustered
-            #if len(cluster2 > 0):
-            #    ax.scatter(cluster2[:, 0], cluster2[:, 1], s=s, color='blue')
-
-            # do obstacles
             for obstacle in obstacles:
                 circle = Circle(tuple(obstacle), obstacleRadius, color='black')
                 ax.add_patch(circle)
 
+            i = 0
+            robot_states = robot_statesPerTime[:,timestep]
             for robot in zip(x[:,timestep], y[:,timestep]):
                 circle = Circle(robot, particle_radius, color='red')
-                visSphere = Circle(robot, torque_radius, alpha=0.3, color='wheat')
+                if robot_states[i] == 0:
+                    color_vs = 'wheat'
+                if robot_states[i] == 1:
+                    color_vs = 'green'
+                if robot_states[i] == 2:
+                    color_vs = 'lightsalmon'
+                if robot_states[i] == 3:
+                    color_vs = 'darkred'
+                visSphere = Circle(robot, torque_radius, alpha=0.3, color=color_vs)
                 ax.add_patch(visSphere)
                 ax.add_patch(circle)
+                i += 1
 
             for item in zip(item_positions[:,0], item_positions[:,1]):
                 circle = Circle(item, particle_radius, color='green')

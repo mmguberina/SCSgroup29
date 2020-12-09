@@ -3,35 +3,49 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from celluloid import Camera
 import matplotlib
-from movementFuns import *
+from getForcesFromNeighbourhoods import *
 from animate import *
 from environments import *
+from realismFunctions import *
+from getVelocitiesFromStates import *
+
+# TODO
+# rename functions and stuff so that they are called by their respective states
+# possibly shift state transitions in there also
+# point is the simulation fuction should just update steps and gather data
+# let other functions handle all logic
 
 
 # to turn this into simple random motion, just don't add the torques (i.e. have only 
 # the random portion of fi change)
-def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0, FW0, obstacles, 
-        obstacleRadius, out=None):
+def activeSwimmers(x, y, item_positions_set, delivery_station, n, T0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, FR0, FI0, FO0, obstacles, 
+        obstacleRadius, nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance):
 
     nOfCollectedItemsPerTime = [[0,0]]
     item_positions_list = np.array(list(item_positions_set))
     item_positions_listPerTime = [[0, item_positions_list]]
     nOfItems = len(item_positions_set)
+    fi = np.random.random(nOfRobots) * 2*np.pi
 
-    # 0 is search, 1 is delivering, 2 is going to pick up a spotted item
+    # 0 is search, 1 is delivering, 2 is going to pick up a spotted item, 3 if they are unstucking themselves
     robot_states = np.zeros(nOfRobots)
     robot_storage = {rob:[] for rob in range(nOfRobots)}
+
+    # this deals with state 3 and has to be inited before all else
+    unstuckers = {}
+
     for step in range(n):
 
-        rand = (np.random.random((nOfRobots, 1)) - 0.5) * ni
-        randFactors = np.array([rand[r] if robot_states[r] == 0 else 0.0 for r in range(nOfRobots)])
+        ####################################################################################
+        # calculate movemenent stuff
+        ####################################################################################
 
         pos = np.hstack((x[:, step].reshape((nOfRobots,1)), 
                          y[:, step].reshape((nOfRobots,1))))
         # also get the speeds for each particle
         # this already is vhat 'cos sin^2(x) + cos^2(x) = 1
-        v_hat = np.hstack((np.cos(fi[:, step]) .reshape((nOfRobots,1)), 
-                            np.sin(fi[:, step]).reshape((nOfRobots,1))))
+        v_hat = np.hstack((np.cos(fi) .reshape((nOfRobots,1)), 
+                            np.sin(fi).reshape((nOfRobots,1))))
 
         # get nbhds
         robRobNeig, robItemNeig, robObsNeig = getNeighbourhoods(pos, item_positions_list, 
@@ -46,21 +60,37 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
 
         force_rob = FR0 * force_rob
         #force_item = FI0 * force_item 
-        #force_obs = FW0 * force_obs
+        force_obs = FO0 * force_obs
 
         torque_obs = calcTorqueObs(pos, robot_states, robObsNeig, v_hat, nOfRobots, obstacleRadius)
 
-        fi[:, step+1] = fi[:, step] + randFactors.reshape((nOfRobots,))
-        fi[:, step+1] = fi[:, step+1] - torque_obs
 
-        v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfRobots,1))) , 
-                            np.sin(fi[:, step+1].reshape((nOfRobots,1)))))
+        ####################################################################################
+        # deal with items and states
+        ####################################################################################
+        # fill this accordingly
+        v_hat = np.zeros((nOfRobots, 2))
+        # TODO you are (correctly) calculating torques only when you're in 0 state!!!!!!!!!!!!!
+        # this needs to be done so that torque calculating functions 
+        # output appropriate x and y changes like everything else!
+        # or have different functions depending on the state!!
+        # TODO that is totally wrong!!!!!!!
 
-        
+        # handle all states here
+        # do all calculations in separate functions
+        explorers, returners, itemPickers = separateByState(robot_states, nOfRobots)
 
-        v_hats2DelSt = v_hat2DeliveryStationFromState(pos, delivery_station, particle_radius, robot_states, nOfRobots)
+        fi = fi - torque_obs
+
+        # state 0 - active swimming (this is overwritten if it's some other state)
+        activeSwimmersStyleRW(fi, ni, v_hat, explorers)
+        #print(v_hat)
+
+        # handle state 1 - delivering to station
+        v_hats2DelSt = v_hat2DeliveryStationFromState(pos, delivery_station, particle_radius, robot_states, returners)
         for robo in v_hats2DelSt:
             isDone = (v_hats2DelSt[robo] == 0).all()
+            # if done, drop off the item and go back to roaming
             if isDone:
                 nOfCollectedItemsPerTime.append([step, nOfCollectedItemsPerTime[-1][1] + len(robot_storage[robo])])
                 robot_storage[robo].clear()
@@ -68,15 +98,27 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
             else:
                 v_hat[robo] = v_hats2DelSt[robo]
 
-        
-        robsWithNearItems = v_hat2NearItem(pos, robItemNeig, particle_radius, nOfRobots, robot_states)
+        # handle state 2 - picking up visible item
+        newItemPickers = explorers2ItemPickers(robItemNeig, explorers)
+        for robo in newItemPickers:
+            robot_states[robo] = 2
+
+        robsWithNearItems = v_hat2NearItem(pos, robItemNeig, particle_radius, itemPickers)
 #        # returns either vector (ndarray) to item or tuple denoting item position if it has been picked up
         for robo in robsWithNearItems:
             if type(robsWithNearItems[robo]) == tuple:
+                # do this if it failed to procure the item by losing sight of it
+                if robsWithNearItems[robo] == (-1,-1):
+                    robot_states[robo] = 0
+                    continue
                 robot_storage[robo].append(robsWithNearItems[robo])
                 item_positions_set.remove(robsWithNearItems[robo])
                 nOfItems -= 1
                 if nOfItems == 0:
+                    # TODO# TODO# TODO
+                    # TODO simulation should end when they all return to base 
+                    # after some max final step which denotes end of battery life
+                    # TODO# TODO# TODO
                     return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
                 robot_states[robo] = 1
 
@@ -84,12 +126,32 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
                 item_positions_listPerTime.append([step, item_positions_list])
             else:
                 v_hat[robo] = robsWithNearItems[robo]
-                robot_states[robo] = 2
+
+        # handle state 3 - unstucking
+        if step > stuckThresholdTime:
+            newStuckRobots = findAndInitStuck(x, y, step, nOfRobots, robot_states, nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)
+            unstuckers.update(newStuckRobots)
+            for robo in newStuckRobots:
+                robot_states[robo] = 3
+
+            for robo in unstuckers:
+                unstuckers[robo][1] -= 1
+                if unstuckers[robo][1] == 0:
+                    robot_states[robo] = unstuckers[robo][0]
+                    unstuckers.pop(robo)
+
+            activeSwimmersStyleRW(fi, ni, v_hat, unstuckers)
 
 
 
-# make this be chosen by some nice ifs because you will be tweaking it a lot
 
+
+        ####################################################################################
+        # updating 
+        # NOTE: fi is updated above because it is needed to calculate new velocities
+        ####################################################################################
+
+# TODO make should be chosen by some nice ifs because you will be tweaking it a lot
         x[:, step+1] = x[:,step] +  v * v_hat[:,0]
         x[:, step+1] = x[:, step+1] + force_rob[:,0] 
         #x[:, step+1] = x[:, step+1] - force_item[:,0] 
@@ -114,7 +176,8 @@ def activeSwimmers(x, y, fi, item_positions_set, delivery_station, n, T0, nOfRob
         # think of this function as simply having the code put in another place, not
         # really a function with inputs and outputs
         volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nOfRobots, obstacleRadius)
-            
+        # this will be used for interpretable animation
+        robot_statesPerTime[:,step] = robot_states 
     return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
 
 
@@ -136,12 +199,16 @@ particle_radius = 5
 torque_radius = 100 
 FI0 = 1
 FR0 = 1
-FW0 = 1
+FO0 = 1
+
+nOfUnstuckingSteps = 1000
+stuckThresholdTime = 200
+stuckThresholdDistance = v * 10
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 9000
+N = 8000
 # Initial values of x.
 # you should init this to sth other than 0
 x = np.zeros((1 * nOfRobots,N+1))
@@ -150,8 +217,9 @@ x[:,0] = 2 * np.random.random(nOfRobots) - 1 + 500
 y = np.zeros((1 * nOfRobots,N+1))
 #y[:,0] = np.random.random(nOfRobots) * gridSize
 y[:,0] = 2 * np.random.random(nOfRobots) - 1 + 500
-fi = np.zeros((1 * nOfRobots,N+1))
-fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
+#fi = np.zeros((1 * nOfRobots,N+1))
+#fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
+robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 #x[:, 0] = 0.0
 
 
@@ -168,8 +236,8 @@ item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, ob
 
 
 
-x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, fi, item_positions_set, delivery_station, N, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, 
-    particle_radius, torque_radius, FR0, FI0, FW0, obstacles, obstacleRadius)
+x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = activeSwimmers(x, y, item_positions_set, delivery_station, N, torque0, nOfRobots, ni, v, trans_dif_T, rot_dif_T, gridSize, 
+    particle_radius, torque_radius, FR0, FI0, FO0, obstacles, obstacleRadius, nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)
 
 fig, ax = plt.subplots()
 ax.grid()
@@ -178,7 +246,7 @@ camera = Camera(fig)
 s = (3*(ax.get_window_extent().width  / (gridSize+1.) * 72./fig.dpi) ** 2)
 
 # item_positions_list changes, you need to send a list of lists to know the changes
-visualise(x, y, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
+visualise(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
 
 
 animation = camera.animate()
