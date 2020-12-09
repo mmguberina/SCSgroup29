@@ -134,22 +134,22 @@ def activeSwimmers(x, y, item_positions_set, delivery_station, n, T0, nOfRobots,
             for robo in newStuckRobots:
                 robot_states[robo] = 3
 
+            doneWithUnstucking = set()
             for robo in unstuckers:
                 unstuckers[robo][1] -= 1
                 if unstuckers[robo][1] == 0:
                     robot_states[robo] = unstuckers[robo][0]
-                    unstuckers.pop(robo)
+                    # can't remove dict item when iterating over the dict
+                    #unstuckers.pop(robo)
+                    doneWithUnstucking.add(robo)
+            for robo in doneWithUnstucking:
+                unstuckers.pop(robo)
 
             activeSwimmersStyleRW(fi, ni, v_hat, unstuckers)
 
 
 
 
-
-        ####################################################################################
-        # updating 
-        # NOTE: fi is updated above because it is needed to calculate new velocities
-        ####################################################################################
 
 # TODO make should be chosen by some nice ifs because you will be tweaking it a lot
         x[:, step+1] = x[:,step] +  v * v_hat[:,0]
@@ -192,6 +192,8 @@ ni = nis[-1]
 #v = 0.05
 v = 0.3
 # Total time.
+
+# TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
 obstacleRadius = 30
 gridSize = 1000
 torque0 = 1
@@ -201,16 +203,15 @@ FI0 = 1
 FR0 = 1
 FO0 = 1
 
-nOfUnstuckingSteps = 1000
+nOfUnstuckingSteps = 600
 stuckThresholdTime = 200
-stuckThresholdDistance = v * 10
+stuckThresholdDistance = v * 6
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
 N = 8000
 # Initial values of x.
-# you should init this to sth other than 0
 x = np.zeros((1 * nOfRobots,N+1))
 #x[:,0] = np.random.random(nOfRobots) * gridSize
 x[:,0] = 2 * np.random.random(nOfRobots) - 1 + 500
@@ -231,7 +232,7 @@ delivery_station = np.array([500,500])
 # they must no cover the delivery station
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
 
-# no overla between items and obstacles!
+# no overlap between items and obstacles!
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
 

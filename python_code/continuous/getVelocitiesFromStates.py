@@ -82,8 +82,8 @@ def findAndInitStuck(x, y, timestep, nOfRobots, robot_states, nOfUnstuckingSteps
         # don't refresh those that are already stuck
         if robot_states[i] == 3:
             continue
-        amountMoved = np.sum(np.abs(x[i, timestep - stuckThresholdTime:timestep])) \
-                    + np.sum(np.abs(y[i, timestep - stuckThresholdTime:timestep]))
+        amountMoved = np.sum(np.abs(x[i, timestep - stuckThresholdTime:timestep] - x[i,timestep])) \
+                    + np.sum(np.abs(y[i, timestep - stuckThresholdTime:timestep] - y[i,timestep]))
         if amountMoved < stuckThresholdDistance:
             # remember previous state
             newStuckRobots[i] = [robot_states[i], nOfUnstuckingSteps]
