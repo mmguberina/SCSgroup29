@@ -12,6 +12,19 @@ def activeSwimmersStyleRW(fi, ni, v_hat, swimmers):
         v_hat[i] = np.array( [ np.cos(fi[i]), np.sin(fi[i]) ] )
         ind += 1
 
+# TODO write this
+# can be done in different ways, all relevant of which are inn the
+# sample old code folders under some name
+# not doing it now as it's easy and i have better things to tend to rn
+def activeSwimmersBrownianStyle(fi, ni, v_hat, swimmers):
+    nOfSwimmers = len(swimmers)
+    rand = (np.random.random(nOfSwimmers) - 0.5) * ni
+
+    ind = 0
+    for i in swimmers:
+        fi[i] = fi[i] + rand[ind]
+        v_hat[i] = np.array( [ np.cos(fi[i]), np.sin(fi[i]) ] )
+        ind += 1
 
 # state 1 : returners going back to delivery station
 # if you arrive to the delivery station, signal to main program thay you are done
@@ -73,7 +86,7 @@ def v_hat2NearItem(pos, robItemNeig, particle_radius, itemPickers):
 
 # state 3 : unstucking aka going random but remembering last state in which you need to go back to
 # stucks need to go randomly with high randomness for some time interval
-# TODO debug this thing
+# --> that's all handeled in the main loop because this is very very much state related
 def findAndInitStuck(x, y, timestep, nOfRobots, robot_states, nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance):
     # key: robot_id, value: remaining steps to get unstuck
     newStuckRobots = {}
@@ -92,19 +105,49 @@ def findAndInitStuck(x, y, timestep, nOfRobots, robot_states, nOfUnstuckingSteps
 
 
 
-# TODO write this thing
-def generateLevyFlightSteps(x, y, nOfRobots, robot_states, nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance):
-    # key: robot_id, value: remaining steps to get unstuck
-    stuckRobots= {}
-    # TODO do this completely in vector form 
-    for i in range(nOfRobots):
-        # don't refresh those that are already stuck
-        if robot_states[i] == 3:
-            continue
-        amountMoved = np.sum(np.abs(x[i, -stuckThresholdTime:])) + np.sum(np.abs(y[i, -stuckThresholdTime:]))
-        if amountMoved < stuckThresholdDistance:
-            # remember previous state
-            stuckRobots[i] = [robot_states[i], nOfUnstuckingSteps]
-            robot_states[i] = 3
+# TODO TEST this thing
+# this works in the following manner:
+#   instead of generating a new direction for every timestep
+#   you stick to one direction for some amount of steps
+#   these amount of steps randomly decided on 
+#   by sampling from a heavy-tailed distribution
+#   making this work will require setting up a new state which denotes that a robot
+#   is following the prescribed trajectory
+# long walks will be broken if items are encoutered and so on
+# of course that is something that will be optimized as well
+# NOTE the distribution you want for this is called the cauchy distribution
+# (it's heavy tailed but has nice analytical properties (thus fast compute too))
+# --> check its wiki page to learn more
+# TODO learn how these things are parametrized (check papers) and then do a thing
+def generateLevyFlightSteps(fi, v, swimmers, gridSize):
+    nOfSwimmers = len(swimmers)
+    newLevySwimmers = {}
 
-    return stuckRobots
+    # this will sometimes give huge ass values, 
+    # it's centered at 0
+    # and now it needs to be turned into directions and n of timesteps
+    # to normalize somehow, take this to be mean distance and then
+    # make all smaller than v equal to v, and all bigger than 
+    # gridSize to be equal to gridSize (that's given by robot design)
+    rand = np.random.standard_cauchy(nOfSwimmers)
+    fi = np.random.random(nOfRobots) * 2*np.pi
+    v_hat = np.hstack(( np.cos(fi).reshape((nOfSwimmers,1)), 
+            np.sin(fi).reshape((nOfSwimmers,1))))
+
+    ind = 0
+    nsOfTimesteps = np.fix(rand / v) + 1
+    for i in swimmers:
+        # make this less crude if possible
+        newLevySwimmers[i] = [v_hat[ind], nsOfTimesteps]
+        ind += 1
+    return newLevySwimmers
+
+# now monitor this the same way you monitor unstuckers in the main loop
+# (it's mostly the same thing really)
+# down the line have choose between levy and brownian based 
+# whatever criteria makes sense (count obstacles and items 
+# for a limited time frame and similar schemes). 
+# then have an ann pick between them (or whatever else)
+# then evolve the ann to choose based on the given input so that 
+# the goal is maximized (area covered / items collected / whatever)
+
