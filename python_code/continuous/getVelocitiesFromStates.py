@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import norm
 
 # state 0 : explorers
 # roam randomly - forces are superimposed on this
@@ -16,9 +17,10 @@ def activeSwimmersStyleRW(fi, ni, v_hat, swimmers):
 # can be done in different ways, all relevant of which are inn the
 # sample old code folders under some name
 # not doing it now as it's easy and i have better things to tend to rn
-def activeSwimmersBrownianStyle(fi, ni, v_hat, swimmers):
+def swimmersBrownianStyle(fi, v_hat, swimmers, deviation):
     nOfSwimmers = len(swimmers)
-    rand = (np.random.random(nOfSwimmers) - 0.5) * ni
+    # you need to fix 
+    rand = norm.rvs(size=nOfSwimmers, scale=deviation)
 
     ind = 0
     for i in swimmers:
@@ -119,7 +121,7 @@ def findAndInitStuck(x, y, timestep, nOfRobots, robot_states, nOfUnstuckingSteps
 # (it's heavy tailed but has nice analytical properties (thus fast compute too))
 # --> check its wiki page to learn more
 # TODO learn how these things are parametrized (check papers) and then do a thing
-def generateLevyFlightSteps(fi, v, swimmers, gridSize):
+def generateLevyFlightSteps(v, swimmers, gridSize):
     nOfSwimmers = len(swimmers)
     newLevySwimmers = {}
 
@@ -130,17 +132,23 @@ def generateLevyFlightSteps(fi, v, swimmers, gridSize):
     # make all smaller than v equal to v, and all bigger than 
     # gridSize to be equal to gridSize (that's given by robot design)
     rand = np.random.standard_cauchy(nOfSwimmers)
-    fi = np.random.random(nOfRobots) * 2*np.pi
+    fi = np.random.random(nOfSwimmers) * 2*np.pi
     v_hat = np.hstack(( np.cos(fi).reshape((nOfSwimmers,1)), 
             np.sin(fi).reshape((nOfSwimmers,1))))
 
     ind = 0
-    nsOfTimesteps = np.fix(rand / v) + 1
+    nsOfTimesteps = np.abs(np.fix(rand / v)) + 1
     for i in swimmers:
         # make this less crude if possible
-        newLevySwimmers[i] = [v_hat[ind], nsOfTimesteps]
+        newLevySwimmers[i] = [v_hat[ind], nsOfTimesteps[ind]]
         ind += 1
     return newLevySwimmers
+
+
+def levySwim(levySwimmers, v_hat):
+    for i in levySwimmers:
+        v_hat[i] = levySwimmers[i][0]
+
 
 # now monitor this the same way you monitor unstuckers in the main loop
 # (it's mostly the same thing really)

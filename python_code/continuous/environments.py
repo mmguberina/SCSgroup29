@@ -1,6 +1,8 @@
 import numpy as np
 
 
+# NOTE the obstacles must be initialized so that they don't cover the delivery station nor it's surroundings
+#   --> it can realistically be expected that an actual station won't be positioned in a bad place anyway
 def initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station):
     coveredArea = gridSize**2 * percetangeOfCoverage
     nOfObstacles = int(coveredArea / obstacleRadius / 5)
@@ -9,9 +11,12 @@ def initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_st
     rnorms = np.linalg.norm(r_to_ds, axis=1)
     obstacles = np.array([obstacles[i] for i in range(len(obstacles)) if rnorms[i] > 2 * obstacleRadius ])
     return obstacles
-    
 
-# this is disgustingly bad
+
+
+
+# NOTE items must be initialize so that they don't overlap with obstacles
+# this is disgustingly bad from an efficiency standpoint
 # hopefully it runs only once so let's pretend it's not possibly the worst code i've ever written
 def initializeItems(nOfItems, gridSize, obstacles, obstacleRadius):
     obstaclesSet = set(map(tuple, obstacles))
@@ -46,5 +51,8 @@ def initializeItems(nOfItems, gridSize, obstacles, obstacleRadius):
 
     return item_positions_set, item_positions_list
 
+
+
+# TODO create a forest-like environment
 def initializeForest(percetangeOfCoverage, gridSize):
     pass

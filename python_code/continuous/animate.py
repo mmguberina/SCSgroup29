@@ -4,10 +4,12 @@ from celluloid import Camera
 from matplotlib.patches import Circle
 from matplotlib.collections import PatchCollection
 
-def visualise(x, y, robot_statesPerTime, item_positions, N, nOfRobots, particle_radius, ax, camera, s, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius):
+def animate(x, y, robot_statesPerTime, item_positions, N, nOfRobots, particle_radius, ax, camera, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius):
     item_positions_listPerTime.reverse()
     nOfCollectedItemsPerTime.reverse()
     currently_collected = 0
+    # in case there won't be any, otherwise it's assigned below
+    item_positions = []
 
     for timestep in range(N):
        # for i in range(nOfRobots):
@@ -47,14 +49,17 @@ def visualise(x, y, robot_statesPerTime, item_positions, N, nOfRobots, particle_
                     color_vs = 'lightsalmon'
                 if robot_states[i] == 3:
                     color_vs = 'darkred'
+                if robot_states[i] == 4:
+                    color_vs = 'goldenrod'
                 visSphere = Circle(robot, torque_radius, alpha=0.3, color=color_vs)
                 ax.add_patch(visSphere)
                 ax.add_patch(circle)
                 i += 1
 
-            for item in zip(item_positions[:,0], item_positions[:,1]):
-                circle = Circle(item, particle_radius, color='green')
-                ax.add_patch(circle)
+            if len(item_positions) > 0:
+                for item in zip(item_positions[:,0], item_positions[:,1]):
+                    circle = Circle(item, particle_radius, color='green')
+                    ax.add_patch(circle)
             
             if len(cluster2) > 0:
                 for clst in cluster2:
