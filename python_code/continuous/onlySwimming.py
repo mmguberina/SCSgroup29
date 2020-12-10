@@ -8,6 +8,8 @@ from environments import *
 from getVelocitiesFromStates import *
 from realismFunctions import *
 
+from funcAnimate import *
+
 
 def onlyRandomWalks(x, y, N, nOfRobots, gridSize,  robot_statesPerTime,# sim params
                    v, particle_radius, # environment robot physical params 
@@ -141,21 +143,28 @@ deviation = nis[1]
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
     onlyRandomWalks(x, y, N, nOfRobots, gridSize,  robot_statesPerTime,# sim params
                    v, particle_radius, # environment robot physical params 
-                   ni, trans_dif_T, rot_dif_T, walkType, deviation)                                          # random walk params)       # unstucking parameter
+                   ni, trans_dif_T, rot_dif_T, walkType, deviation)  # random walk params
 
 fig1, ax1 = plt.subplots(1)
 ax1.grid()
-# Plot the 2D trajectory.
+# camera anim
 camera = Camera(fig1)
-
 # item_positions_list changes, you need to send a list of lists to know the changes
 animate(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_radius, ax1, camera, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
-
-
 animation = camera.animate()
-animation.save('only' + walkType + '.mp4')
+animation.save('./vids/building_blocks/only' + walkType + '.mp4')
 
 
+
+
+# funcanimation anim
+#nOfSkippedFrames = 30
+#item_positions = []
+#anim = matplotlib.animation.FuncAnimation(fig1, frameUpdate, frames=N//nOfSkippedFrames, init_func=None, fargs=(x, y, robot_statesPerTime, N, nOfRobots, particle_radius, ax1, item_positions, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius, nOfSkippedFrames,), blit=True, cache_frame_data=True) 
+#
+#anim.save('testest.mp4')
+
+# do other plots in this fashion
 fig2, ax2 = plt.subplots(1)
 for i in range(nOfRobots):
     ax2.set_title("walking type: " + walkType)

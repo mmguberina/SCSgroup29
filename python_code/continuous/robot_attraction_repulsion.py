@@ -6,6 +6,7 @@ import matplotlib
 from animate import *
 from environments import *
 from runSim import *
+from funcAnimate import *
 
 
 
@@ -36,7 +37,7 @@ stuckThresholdDistance = v * 6
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 8000
+N = 800
 # Initial values of x.
 x = np.zeros((1 * nOfRobots,N+1))
 #x[:,0] = np.random.random(nOfRobots) * gridSize
@@ -72,6 +73,7 @@ x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
 fig, ax = plt.subplots()
 ax.grid()
 # Plot the 2D trajectory.
+# the camera way
 camera = Camera(fig)
 
 # item_positions_list changes, you need to send a list of lists to know the changes
@@ -80,4 +82,11 @@ animate(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_r
 
 animation = camera.animate()
 animation.save('robot_roam=' +str(ni)  +'.mp4')
+
+# funcanim way
+#nOfSkippedFrames = 1
+#anim = matplotlib.animation.FuncAnimation(fig, frameUpdate, frames=N//nOfSkippedFrames, init_func=None, fargs=(x, y, robot_statesPerTime, N, nOfRobots, particle_radius, ax, item_positions_list, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius, nOfSkippedFrames,), blit=True, cache_frame_data=True) 
+#anim.save('testest.mp4')
+
+
 plt.show()

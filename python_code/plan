@@ -1,10 +1,29 @@
 ###################################################
 the plan
 ###################################################
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+PREPARE FOR PREZ
+-------------
+create plots reprezenting every concept and also put in benchmarks there
+- motion
+- artificial potential fields
+- influence of obstacles
+- bla you know what has been done just plot it in a fun way
 
 high-level
 ----------
-1. be done with boring bullshit
 3. implement all reasonable algorithms (the benchmarks too, but that's not a priority rn)
 4. put all of them in various situations (various sizes, n of items, floor layouts etc)
 5. reasses the situation again
@@ -16,6 +35,7 @@ more specific
 1. finalize the environment:
 	---> create the outer and inner walls (via variuos functions)
 	---> generate new goals on the fly.
+====> MAKE STORIES AND APPROPRIATE ENVIRONMENTS
 thing is, these walls will have to do the following:
 1) be impassable (which also needs to be dealt with when initializing)
 2) block vision. this would not be a problem in a proper simulation environment,
@@ -23,13 +43,12 @@ thing is, these walls will have to do the following:
 3) generate artificial force fields which leads to them being avoided
 
 
-3.	a) random brownian
-	b) random levy
-	c) attraction-repulsion via artifial potential field
+3.	
 	d) combinations of above
-		===> try to formalize behaviour as state machine swithing between modes 
+		===> state machine swithing between modes 
 			 based on various criteria
-		===> you can then also optimize the switching thresholds with the GA
+				===> you can then also optimize the switching thresholds with the GA
+				===> or make a neural network learn how to tune params based on data
 
 4. do both warehouse and truffle searching and whatever. have random env, changing env, sparse, dense,...
 
