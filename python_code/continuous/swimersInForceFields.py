@@ -1,7 +1,11 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
 from scipy.stats import norm
 from getForcesFromNeighbourhoods import *
+from celluloid import Camera
 from animate import *
+from environments import *
 from realismFunctions import *
 from getVelocitiesFromStates import *
 
@@ -24,12 +28,7 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
     robot_states = np.zeros(nOfRobots)
     robot_storage = {rob:[] for rob in range(nOfRobots)}
 
-    # this deals with state 3 and has to be inited before all else
-    unstuckers = {}
-    # this deals with state 4
     levySwimmers = {}
-
-
     for step in range(N):
 
         ####################################################################################
@@ -44,7 +43,7 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 #                            np.sin(fi).reshape((nOfRobots,1))))
 
         # get nbhds
-        robRobNeig, robItemNeig, robObsNeig = getNeighbourhoods(pos, item_positions_list, 
+        robRobNeig, robItemNeig, robObsNeig = getNeighbourhoodsForTesting(pos, item_positions_list, 
                 nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius)
 
 
@@ -108,65 +107,6 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
             else:
                 v_hat[robo] = v_hats2DelSt[robo]
 
-        # handle state 2 - picking up visible item
-        newItemPickers = explorers2ItemPickers(robItemNeig, explorers)
-        newItemPickers_fromLevy = explorers2ItemPickers(robItemNeig, levySwimmers)
-        # since levy flight persists over new timesteps, they need to be deleted from there
-        # if they switched state to going to object
-        # NOTE this might not actually be what you want to happen, but we'll think about that later
-        for newItemPicker_fromLevy in newItemPickers_fromLevy:
-            levySwimmers.pop(newItemPicker_fromLevy)
-
-        newItemPickers.update(newItemPickers_fromLevy)
-        for robo in newItemPickers:
-            robot_states[robo] = 2
-
-        robsWithNearItems = v_hat2NearItem(pos, robItemNeig, particle_radius, itemPickers)
-#        # returns either vector (ndarray) to item or tuple denoting item position if it has been picked up
-        for robo in robsWithNearItems:
-            if type(robsWithNearItems[robo]) == tuple:
-                # do this if it failed to procure the item by losing sight of it
-                if robsWithNearItems[robo] == (-1,-1):
-                    robot_states[robo] = 0
-                    continue
-                robot_storage[robo].append(robsWithNearItems[robo])
-                item_positions_set.remove(robsWithNearItems[robo])
-                nOfItems -= 1
-                if nOfItems == 0:
-                    # TODO# TODO# TODO
-                    # TODO simulation should end when they all return to base 
-                    # after some max final step which denotes end of battery life
-                    # TODO# TODO# TODO
-                    return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
-
-                # put it in going back mode
-                robot_states[robo] = 1
-
-                item_positions_list = np.array(list(item_positions_set))
-                item_positions_listPerTime.append([step, item_positions_list])
-            else:
-                v_hat[robo] = robsWithNearItems[robo]
-
-        # handle state 3 - unstucking
-        if step > stuckThresholdTime:
-            newStuckRobots = findAndInitStuck(x, y, step, nOfRobots, robot_states, nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)
-            unstuckers.update(newStuckRobots)
-            for robo in newStuckRobots:
-                robot_states[robo] = 3
-
-            doneWithUnstucking = set()
-            for robo in unstuckers:
-                unstuckers[robo][1] -= 1
-                if unstuckers[robo][1] == 0:
-                    robot_states[robo] = unstuckers[robo][0]
-                    # can't remove dict item when iterating over the dict
-                    #unstuckers.pop(robo)
-                    doneWithUnstucking.add(robo)
-            for robo in doneWithUnstucking:
-                unstuckers.pop(robo)
-
-            swimmersBrownianStyle(fi, v_hat, unstuckers, deviation)
-
 
 
         ####################################################################################
@@ -174,8 +114,10 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
         ####################################################################################
 
         # TODO check signs, strengths and other stuff
-        force_rob = FR0 * calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius)
-        torque_rob = FR0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
+        force_rob = calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius)
+        force_rob = FR0 * force_rob
+        #torque_rob = FR0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
+        torque_rob = 0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
 
         force_item = FI0 * calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius)
 
@@ -226,3 +168,88 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
         # this will be used for interpretable animation
         robot_statesPerTime[:,step] = robot_states 
     return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
+
+
+
+nOfRobots = 40
+#rot_dif_T = 0.2
+#trans_dif_T = 0.2
+#v = 1
+nis = [np.pi *2, np.pi * 0.02, np.pi * 0.002]
+ni = nis[1] 
+v = 0.05
+#v = 0.3
+# Total time.
+
+# TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
+obstacleRadius = 30
+gridSize = 100
+T0 = 1
+particle_radius = 1
+torque_radius = 20 
+FI0 = 0.11#0.5
+FR0 = 1
+FO0 = 0.1
+deviation = 0.55
+
+nOfUnstuckingSteps = 600
+stuckThresholdTime = 200
+stuckThresholdDistance = v * 6
+
+rot_dif_T = 0.2
+trans_dif_T = 0.2
+# Number of steps.
+N = 3000
+# Initial values of x.
+x = np.zeros((1 * nOfRobots,N+1))
+#x[:,0] = np.random.random(nOfRobots) * gridSize
+x[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+y = np.zeros((1 * nOfRobots,N+1))
+#y[:,0] = np.random.random(nOfRobots) * gridSize
+y[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+#fi = np.zeros((1 * nOfRobots,N+1))
+#fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
+robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
+#x[:, 0] = 0.0
+
+
+# 5 items
+#nOfItems = 50
+nOfItems = 0
+
+#percetangeOfCoverage = 0.01
+percetangeOfCoverage = 0.0
+delivery_station = np.array([0,0])
+
+obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
+
+item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
+
+walkType = 'levyFlight'
+#walkType = 'activeSwimming'
+#walkType = 'brownianMotion'
+
+
+x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
+    runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
+                   v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
+                   walkType, ni, trans_dif_T, rot_dif_T, deviation,                                          # random walk params
+                   T0, FR0, FI0, FO0,                                                    # artificial potential field parameters 
+                   nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)       # unstucking parameters
+
+fig1, ax1 = plt.subplots(1)
+ax1.grid()
+# Plot the 2D trajectory.
+# the camera way
+camera = Camera(fig1)
+
+# item_positions_list changes, you need to send a list of lists to know the changes
+animate(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_radius, ax1, camera, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
+
+
+animation = camera.animate()
+animation.save('only_walks_and_APF_obs' + str(len(obstacles)) + '_item_' + str(nOfItems) + '_robots_' + str(nOfRobots) + '.mp4')
+
+
+# TODO generate artificial field plot as well
+plt.show()

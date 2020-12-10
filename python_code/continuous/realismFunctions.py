@@ -83,3 +83,34 @@ def volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nO
 
 
 
+def getNeighbourhoodsForTesting(pos, item_positions_list, nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius):
+    nOfObss = len(obstacles)
+    robRobNeig = {i:[] for i in range(nOfRobots)}
+    robItemNeig = {i:[] for i in range(nOfRobots)}
+    robObsNeig = {i:[] for i in range(nOfRobots)}
+    noItems = False
+    noObstacles = False
+    for i in range(nOfRobots):
+        # calculate direction vector to every vector ( r_i,i is not a thing tho)
+
+        if len(item_positions_list) > 0:
+            r_item = pos[i] - item_positions_list
+            rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
+            robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < torque_radius}
+        else:
+            noItems = True
+
+        if len(obstacles) > 0:
+            r_obs  = pos[i] - obstacles
+            rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObss,1))
+            robObsNeig[i] = {tuple(obstacles[o]) for o in range(nOfObss) 
+                        if rnorms_obs[o] - obstacleRadius < torque_radius}
+        else:
+            nOfObstacles = True
+
+        r_rob = pos[i] - pos 
+        rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobots,1))
+        robRobNeig[i] = {rob for rob in range(nOfRobots) 
+                if rnorms_rob[rob] < torque_radius and rob != i}
+
+    return robRobNeig, {} if nOfItems else robItemNeig , {} if noObstacles else robObsNeig

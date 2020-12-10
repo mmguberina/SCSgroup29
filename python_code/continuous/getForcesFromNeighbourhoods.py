@@ -178,9 +178,10 @@ def calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius):
         # NOTE maybe this should be without the square!
         # TODO try both!
             rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p] - particle_radius)**2 for p in range(nOfRobotsInNeigh)])
-            force =  np.sum(rob_forces) 
+            force =  np.sum(rob_forces,axis=0) 
             # it works because it's per element
-            force_rob[i] = force if np.abs(force) < v else 0.05 * np.sign(force)
+            # TODO rewrite this last thing in vector form for the speeeed
+            force_rob[i] = force if np.abs(np.linalg.norm(force)) < v else v * np.sign(force)
 
     return force_rob
 
@@ -201,8 +202,9 @@ def calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius):
         # NOTE maybe this should be without the square!
         # TODO try both!
             item_forces = np.array([r_item_hat[p] / (rnorms_item[p])**2 for p in range(nOfItemsInNeigh)])
-            force =  np.sum(item_forces) 
-            force_item[i] = force if np.abs(force) < v else v * np.sign(force)
+            force =  np.sum(item_forces, axis=0) 
+            # TODO rewrite this last thing in vector form for the speeeed
+            force_item[i] = force if np.abs(np.linalg.norm(force)) < v else v * np.sign(force)
 
     return force_item
 
@@ -223,8 +225,9 @@ def calcForceObs(v, pos, robObsNeig, nOfRobots, particle_radius, obstacleRadius)
             # NOTE maybe this should be without the square!
             # TODO try both!
             obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius)**2 for p in range(nOfObssInNeigh)])
-            force =  np.sum(obs_forces) 
-            force_obs[i] = force if np.abs(force) < v else v * np.sign(force)
+            force =  np.sum(obs_forces, axis=0) 
+            # TODO rewrite this last thing in vector form for the speeeed
+            force_obs[i] = force if np.abs(np.linalg.norm(force)) < v else v * np.sign(force)
 
     return force_obs
 
