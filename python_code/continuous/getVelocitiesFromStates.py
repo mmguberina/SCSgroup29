@@ -102,7 +102,7 @@ def findAndInitStuck(x, y, timestep, nOfRobots, robot_states, nOfUnstuckingSteps
         if amountMoved < stuckThresholdDistance:
             # remember previous state
             newStuckRobots[i] = [robot_states[i], nOfUnstuckingSteps]
-            print(newStuckRobots)
+            #print(newStuckRobots)
     return newStuckRobots
 
 
