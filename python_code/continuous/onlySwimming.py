@@ -136,7 +136,7 @@ item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, ob
 
 walkType = 'activeSwimming'
 #walkType = 'levyFlight'
-walkType = 'brownianMotion'
+#walkType = 'brownianMotion'
 
 deviation = nis[1]
 

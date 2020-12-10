@@ -11,7 +11,7 @@ from getVelocitiesFromStates import *
 # goes off in one direction for the amount of timesteps specified)
 def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
                    v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
-                   walkType, ni, trans_dif_T, rot_dif_T,                                          # random walk params
+                   walkType, ni, trans_dif_T, rot_dif_T, deviation,                                         # random walk params
                    T0, FR0, FI0, FO0,                                                   # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance       # unstucking parameters
                    ):
@@ -44,25 +44,13 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
                          y[:, step].reshape((nOfRobots,1))))
         # also get the speeds for each particle
         # this already is vhat 'cos sin^2(x) + cos^2(x) = 1
-        v_hat = np.hstack((np.cos(fi) .reshape((nOfRobots,1)), 
-                            np.sin(fi).reshape((nOfRobots,1))))
+#        v_hat = np.hstack((np.cos(fi) .reshape((nOfRobots,1)), 
+#                            np.sin(fi).reshape((nOfRobots,1))))
 
         # get nbhds
         robRobNeig, robItemNeig, robObsNeig = getNeighbourhoods(pos, item_positions_list, 
                 nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius)
 
-        # the hw3 model is not good for this
-        force_rob = calcForceRob(v, pos, robot_states, robRobNeig, v_hat, nOfRobots, particle_radius)
-
-        #force_item = calcForceItem(v, pos, robot_states, robItemNeig, v_hat, nOfRobots, nOfItems, particle_radius)
-
-        force_obs = calcForceObs(v, pos, robot_states, robObsNeig,  v_hat, nOfRobots, nOfItems, particle_radius, obstacleRadius)
-
-        force_rob = FR0 * force_rob
-        #force_item = FI0 * force_item 
-        force_obs = FO0 * force_obs
-
-        torque_obs = calcTorqueObs(pos, robot_states, robObsNeig, v_hat, nOfRobots, obstacleRadius)
 
 
         ####################################################################################
@@ -80,7 +68,6 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
         # do all calculations in separate functions
         explorers, returners, itemPickers = separateByState(robot_states, nOfRobots)
 
-        fi = fi - torque_obs
 
         # state 0 - active swimming (this is overwritten if it's some other state)
         # or handle state 4 - levy flight (going for some time in one direction)
@@ -182,9 +169,29 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
             for robo in doneWithUnstucking:
                 unstuckers.pop(robo)
 
-            activeSwimmersStyleRW(fi, ni, v_hat, unstuckers)
+            swimmersBrownianStyle(fi, v_hat, unstuckers, deviation)
 
 
+
+        ####################################################################################
+        # superimpose forces
+        ####################################################################################
+
+        # the hw3 model is not good for this
+        force_rob = FR0 * calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius)
+        torque_rob = FR0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
+
+        force_item = FI0 * calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius)
+
+        force_obs = FO0 * calcForceObs(v, pos, robObsNeig,  nOfRobots, particle_radius, obstacleRadius)
+
+        # TODO put the coefficients in the force fuctions
+        # and make them < v! (otherwise they will "discontinuously" jump)
+
+        torque_obs = FO0 * calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, nOfRobots, obstacleRadius)
+
+        # TODO TODO TODO CHECK WHETHER THIS MAKES SENSE
+        #fi = fi - torque_obs
 
         ####################################################################################
         # perform position updates 
@@ -193,13 +200,18 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 # TODO make should be chosen by some nice ifs because you will be tweaking it a lot
         x[:, step+1] = x[:,step] +  v * v_hat[:,0]
         x[:, step+1] = x[:, step+1] + force_rob[:,0] 
-        #x[:, step+1] = x[:, step+1] - force_item[:,0] 
-        #x[:, step+1] = x[:, step+1] + force_obs[:,0] 
+        x[:, step+1] = x[:, step+1] + torque_rob[:,0] 
+        x[:, step+1] = x[:, step+1] - force_item[:,0] 
+        x[:, step+1] = x[:, step+1] + force_obs[:,0] 
+        x[:, step+1] = x[:, step+1] + torque_obs[:,0] 
         x[:, step+1] = x[:, step+1] % gridSize
+
         y[:, step+1] = y[:,step] +  v * v_hat[:,1] 
         y[:, step+1] = y[:,step+1] + force_rob[:,1] 
-        #y[:, step+1] = y[:,step+1] - force_item[:,1] 
+        y[:, step+1] = y[:, step+1] + torque_rob[:,1] 
+        y[:, step+1] = y[:,step+1] - force_item[:,1] 
         y[:, step+1] = y[:,step+1] + force_obs[:,1] 
+        y[:, step+1] = y[:,step+1] + torque_obs[:,1] 
         y[:, step+1] = y[:,step+1] % gridSize
 
         

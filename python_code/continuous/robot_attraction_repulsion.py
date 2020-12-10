@@ -10,7 +10,7 @@ from funcAnimate import *
 
 
 
-nOfRobots = 5
+nOfRobots = 20
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -26,9 +26,10 @@ gridSize = 1000
 T0 = 1
 particle_radius = 5
 torque_radius = 100 
-FI0 = 1
-FR0 = 1
-FO0 = 1
+FI0 = 0.11#0.5
+FR0 = 0.1
+FO0 = 0.1
+deviation = 0.55
 
 nOfUnstuckingSteps = 600
 stuckThresholdTime = 200
@@ -61,8 +62,8 @@ obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, del
 
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
-walkType = 'levyFlight'
-#walkType = 'activeSwimming'
+#walkType = 'levyFlight'
+walkType = 'activeSwimming'
 #walkType = 'brownianMotion'
 
 
@@ -70,7 +71,7 @@ x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
     runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
                    v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
                    walkType, ni, trans_dif_T, rot_dif_T,                                          # random walk params
-                   T0, FR0, FI0, FO0,                                                   # artificial potential field parameters 
+                   T0, FR0, FI0, FO0, deviation,                                                   # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)       # unstucking parameters
 
 fig, ax = plt.subplots()
