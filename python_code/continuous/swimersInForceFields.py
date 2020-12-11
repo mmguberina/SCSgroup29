@@ -171,7 +171,7 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 
 
 
-nOfRobots = 40
+nOfRobots = 30
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -183,13 +183,13 @@ v = 0.05
 
 # TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
 obstacleRadius = 30
-gridSize = 100
+gridSize = 500
 T0 = 1
-particle_radius = 1
+particle_radius = 3
 torque_radius = 20 
 FI0 = 0.11#0.5
 FR0 = 1
-FO0 = 0.1
+FO0 = 1
 deviation = 0.55
 
 nOfUnstuckingSteps = 600
@@ -218,15 +218,15 @@ robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 nOfItems = 0
 
 #percetangeOfCoverage = 0.01
-percetangeOfCoverage = 0.0
+percetangeOfCoverage = 0.01
 delivery_station = np.array([0,0])
 
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
 
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
-walkType = 'levyFlight'
-#walkType = 'activeSwimming'
+#walkType = 'levyFlight'
+walkType = 'activeSwimming'
 #walkType = 'brownianMotion'
 
 
@@ -248,7 +248,8 @@ animate(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_r
 
 
 animation = camera.animate()
-animation.save('only_walks_and_APF_obs' + str(len(obstacles)) + '_item_' + str(nOfItems) + '_robots_' + str(nOfRobots) + '.mp4')
+#animation.save('./vids/building_blocks/only_walks_and_APF_obs' + str(len(obstacles)) + '_item_' + str(nOfItems) + '_robots_' + str(nOfRobots) + '.mp4')
+animation.save('testtest' + '.mp4')
 
 
 # TODO generate artificial field plot as well

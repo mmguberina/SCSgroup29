@@ -10,7 +10,7 @@ from funcAnimate import *
 
 
 
-nOfRobots = 20
+nOfRobots = 10
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -22,13 +22,13 @@ v = 0.3
 
 # TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
 obstacleRadius = 30
-gridSize = 1000
+gridSize = 1700
 T0 = 1
 particle_radius = 5
 torque_radius = 100 
-FI0 = 0.11#0.5
-FR0 = 0.1
-FO0 = 0.1
+FI0 = 1.0#0.5
+FR0 = 0.8
+FO0 = 0.4
 deviation = 0.55
 
 nOfUnstuckingSteps = 600
@@ -56,7 +56,7 @@ robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 nOfItems = 50
 
 percetangeOfCoverage = 0.01
-delivery_station = np.array([500,500])
+delivery_station = np.array([gridSize // 2, gridSize // 2])
 
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
 
