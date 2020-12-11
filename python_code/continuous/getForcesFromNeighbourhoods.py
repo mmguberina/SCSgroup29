@@ -79,7 +79,10 @@ def calcTorqueItem(pos, robItemNeig, v_hat, nOfRobots):
             dots_item = np.sum(v_hat[i] * r_item_hat, axis=1).reshape((nOfItemsInNeigh,1))
             # NOTE maybe this should be without the square!
             # TODO try both!
-            coefs_item = dots_item / rnorms_item**2 
+            # NOTE: calcItemField in animateField.py is built on this,
+            # if you change here you gotta change there as well
+            # if you want consistent fields
+            coefs_item = dots_item / rnorms_item**2
             # try repelling them now
             # crosses v_i with r_i and does so for all i
             crosses_item = np.cross(v_hat[i], r_item_hat).reshape((nOfItemsInNeigh, 1))
@@ -115,6 +118,9 @@ def calcTorqueObs(pos, robObsNeig, v_hat, nOfRobots, obstacleRadius):
         dots_obs = np.sum(v_hat[i] * r_obs_hat, axis=1).reshape((nOfObssInNeigh,1))
         # NOTE maybe this should be without the square!
         # TODO try both!
+        # NOTE: calcObsField in animateField.py is built on this,
+        # if you change here you gotta change there as well
+        # if you want consistent fields
         coefs_obs = dots_obs / (rnorms_obs - obstacleRadius)**2 
         # try repelling them now
         # crosses v_i with r_i and does so for all i
@@ -153,6 +159,9 @@ def calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, nOfRobots, obstacleRadius):
         dots_obs = np.sum(v_hat[i] * r_obs_hat, axis=1).reshape((nOfObssInNeigh,1))
         # NOTE maybe this should be without the square!
         # TODO try both!
+        # NOTE: calcObsField in animateField.py is built on this,
+        # if you change here you gotta change there as well
+        # if you want consistent fields
         coefs_obs = dots_obs / (rnorms_obs - obstacleRadius)**2 
         # try repelling them now
         # crosses v_i with r_i and does so for all i
@@ -183,6 +192,9 @@ def calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius):
             # trying it without the square 'cos it seemed way too small
         # NOTE maybe this should be without the square!
         # TODO try both!
+        # NOTE: calcRobField in animateField.py is built on this,
+        # if you change here you gotta change there as well
+        # if you want consistent fields
             rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p] - particle_radius)**2 for p in range(nOfRobotsInNeigh)])
             force =  np.sum(rob_forces,axis=0) 
             # it works because it's per element
@@ -207,6 +219,9 @@ def calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius):
             r_item_hat  = r_item / rnorms_item
         # NOTE maybe this should be without the square!
         # TODO try both!
+        # NOTE: calcItemField in animateField.py is built on this,
+        # if you change here you gotta change there as well
+        # if you want consistent fields
             item_forces = np.array([r_item_hat[p] / (rnorms_item[p])**2 for p in range(nOfItemsInNeigh)])
             force =  np.sum(item_forces, axis=0) 
             # TODO rewrite this last thing in vector form for the speeeed
@@ -230,6 +245,9 @@ def calcForceObs(v, pos, robObsNeig, nOfRobots, particle_radius, obstacleRadius)
             r_obs_hat  = r_obs / rnorms_obs
             # NOTE maybe this should be without the square!
             # TODO try both!
+            # NOTE: calcObsField in animateField.py is built on this,
+            # if you change here you gotta change there as well
+            # if you want consistent fields
             obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius)**2 for p in range(nOfObssInNeigh)])
             force =  np.sum(obs_forces, axis=0) 
             # TODO rewrite this last thing in vector form for the speeeed

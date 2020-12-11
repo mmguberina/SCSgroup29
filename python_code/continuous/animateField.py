@@ -38,7 +38,7 @@ def animateField(x, y, v, robot_statesPerTime, item_positions, N, nOfRobots, par
     # in case there won't be any, otherwise it's assigned below
     item_positions = []
 
-    for timestep in range(N):
+    for timestep in range(1, N):
         if timestep % 40 == 0:
             if len(item_positions_listPerTime) > 0 and timestep >= item_positions_listPerTime[-1][0]:
                 item_positions = item_positions_listPerTime.pop()[1]
@@ -52,7 +52,8 @@ def animateField(x, y, v, robot_statesPerTime, item_positions, N, nOfRobots, par
             actActNeig = {i:[] for i in range(nOfRobots)}
 
             gridx, gridy = np.meshgrid(np.linspace(0, gridSize, fieldResolution),
-                                   np.linspace(0, gridSize, fieldResolution))
+                                       np.linspace(0, gridSize, fieldResolution))
+
             fieldx = np.zeros(gridx.shape)
             fieldy = np.zeros(gridy.shape)
 
@@ -60,9 +61,9 @@ def animateField(x, y, v, robot_statesPerTime, item_positions, N, nOfRobots, par
                              y[:, timestep].reshape((nOfRobots,1))))
 
 
-            v = np.array([x[:,timestep] - x[:,timestep-1], y[:, timestep] - y[:, timestep-1]])
-            robRobNeig, robItemNeig, robObsNeig = getNeighbourhoods(pos, item_positions,
-                                                                    nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius)
+            v = np.array([x[:, timestep] - x[:, timestep-1],
+                          y[:, timestep] - y[:, timestep-1]])
+
             for i in range(nOfRobots):
                 r = pos[i] - pos
                 rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
@@ -97,6 +98,7 @@ def animateField(x, y, v, robot_statesPerTime, item_positions, N, nOfRobots, par
                 for item in zip(item_positions[:,0], item_positions[:,1]):
                     circle = Circle(item, particle_radius, color='green')
                     ax.add_patch(circle)
+                    fieldx, fieldy = calcItemField(item, torque_radius, forceandtorquecoeffs, gridx, gridy, fieldx, fieldy)
 
             if len(cluster2) > 0:
                 for clst in cluster2:
@@ -121,39 +123,39 @@ def calcItemField(item, torqueRadius, forceandtorquecoeffs, gridx, gridy, fieldx
     # find area to work in
     # TODO: I feel like this can be done more efficiently
     # currently we calculate r twice, here and then again a little later
-    rx = (gridx - robot[0])**2
-    ry = (gridy - robot[1])**2
+    rx = (gridx - item[0])**2
+    ry = (gridy - item[1])**2
     r = np.sqrt(rx + ry)
-    iToUse, jToUse = np.where(np.logical_and(r < torqueRadius, r > particleRadius))
+    iToUse, jToUse = np.where(r < torqueRadius)
     xToUse = gridx[iToUse, jToUse]
     yToUse = gridy[iToUse, jToUse]
 
     # some vectors etc we need
     pointsInField = np.vstack((xToUse, yToUse)).transpose() # make sure it's useable
     nOfPoints = len(xToUse)
-    rToUse = pointsInField - robot # vectors, outward from robot
+    rToUse = pointsInField - item # vectors, outward from item
     rnorms = np.linalg.norm(rToUse, axis=1).reshape((len(xToUse),1))
     rhat  = rToUse / rnorms
 
 
-    #calculating torques
-    vnorm = np.linalg.norm(v)
-    vhat = v / vnorm
-    dots = np.sum(vhat * rhat)
-    coefs = dots / (rnorms - particleRadius) # i'll be honest, this is the last step I feel I understand
-    crosses = np.cross(vhat, rhat)
-    particle_torques = coefs * crosses
-    torquesum = np.sum(particle_torques, axis=1).reshape((nOfPoints, 1))
-    torques = vnorm * np.array([np.cos(torquesum), np.sin(torquesum)]).reshape((nOfPoints, 2))
+    # #calculating torques
+    # vnorm = np.linalg.norm(v)
+    # vhat = v / vnorm
+    # dots = np.sum(vhat * rhat)
+    # coefs = dots / (rnorms - particleRadius) # i'll be honest, this is the last step I feel I understand
+    # crosses = np.cross(vhat, rhat)
+    # particle_torques = coefs * crosses
+    # torquesum = np.sum(particle_torques, axis=1).reshape((nOfPoints, 1))
+    # torques = vnorm * np.array([np.cos(torquesum), np.sin(torquesum)]).reshape((nOfPoints, 2))
 
     # add forces and torques
-    fieldx[iToUse, jToUse] += FR0 * rhat[:,0]
-    fieldy[iToUse, jToUse] += FR0 * rhat[:,1]
-    fieldx[iToUse, jToUse] += FO0 * torques[:,0]
-    fieldy[iToUse, jToUse] += FO0 * torques[:,1]
-
+    fieldx[iToUse, jToUse] += FI0 * rhat[:,0]
+    fieldy[iToUse, jToUse] += FI0 * rhat[:,1]
+    # fieldx[iToUse, jToUse] += FI0 * torques[:,0]
+    # fieldy[iToUse, jToUse] += FI0 * torques[:,1]
 
     return fieldx, fieldy
+
 def calcRobField(robot, v, particleRadius, torqueRadius, forceandtorquecoeffs, gridx, gridy, fieldx, fieldy):
     FR0, FI0, FO0, T0 = forceandtorquecoeffs
 
@@ -186,10 +188,11 @@ def calcRobField(robot, v, particleRadius, torqueRadius, forceandtorquecoeffs, g
     torques = vnorm * np.array([np.cos(torquesum), np.sin(torquesum)]).reshape((nOfPoints, 2))
 
     # add forces and torques
+    breakpoint()
     fieldx[iToUse, jToUse] += FR0 * rhat[:,0]
     fieldy[iToUse, jToUse] += FR0 * rhat[:,1]
-    fieldx[iToUse, jToUse] += FO0 * torques[:,0]
-    fieldy[iToUse, jToUse] += FO0 * torques[:,1]
+    fieldx[iToUse, jToUse] += FR0 * torques[:,0]
+    fieldy[iToUse, jToUse] += FR0 * torques[:,1]
 
 
     return fieldx, fieldy
@@ -229,46 +232,6 @@ def calcObsField(obstacle, obstacleRadius, torqueRadius, forceandtorquecoeffs, g
 
     return fieldx, fieldy
 
-
-
-def drawPotentialFields(v, pos, robot_states, robRobNeig, v_hat, nOfRobots, particleRadius, obstacleRadius, torqueRadius, FR0, FO0, obstacles, meshgrid):
-    x, y = meshgrid
-    u = np.zeros(x.shape)
-    v = np.zeros(y.shape)
-
-    for i in range(nOfRobots):
-        # calculate fields
-        breakpoint()
-        robPos = pos[:,i]
-        torque_rob = calcTorqueRob(robPos, robot_states, robRobNeig, v_hat, nOfRobots)
-        force_rob = calcForceRob(v, robPos, robot_states, robRobNeig, v_hat, nOfRobots, particlRadius)
-        # calculate direction vector to things in neighbourhood
-        r_item = pos[i] - np.array(list(map(list, robItemNeig[i])))
-        # calculate the norm of every direction vector
-        rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItemsInNeigh,1))
-        # collect only nearby ones
-        # we need rhat
-        r_item_hat  = r_item / rnorms_item
-        # dot 'em. dot does not support axis thing so we do it like this
-        dots_item = np.sum(v_hat[i] * r_item_hat, axis=1).reshape((nOfItemsInNeigh,1))
-        coefs_item = dots_item / rnorms_item**2
-        # try repelling them now
-        # crosses v_i with r_i and does so for all i
-        crosses_item = np.cross(v_hat[i], r_item_hat).reshape((nOfItemsInNeigh, 1))
-        particle_torques_item = coefs_item * crosses_item
-
-        torque_item[i] = np.sum(particle_torques_item)
-
-        ### # assume fieldx, fieldy are the x and y components of the field
-        ### u += fieldx
-        ### v += fieldy
-
-
-    #force_rob = FR0 * calcForceRob(v, pos, robot_states, robRobNeig, v_hat, nOfRobots, particleRadius)
-    #force_obs = FO0 * calcForceObs(v, pos, robot_states, robObsNeig, v_hat, nOfRobots, obstacleRadius)
-
-
-    return u, v
 
 
 

@@ -59,7 +59,7 @@ robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 #x[:, 0] = 0.0
 
 
-# 5 items
+# 50 items
 nOfItems = 50
 
 percetangeOfCoverage = 0.01
@@ -96,7 +96,7 @@ animateField(x, y, v, robot_statesPerTime, item_positions_list, N, nOfRobots, pa
 print("Animating...")
 animation = camera.animate()
 print("Saving...")
-animation.save('fieldanim=' +str(ni)  +'.mp4')
+animation.save('fieldanim_ni=' +str(ni) + '_N=' + str(N) + '_nRobots=' + str(nOfRobots) + '.mp4')
 print("Done.")
 # funcanim way
 #nOfSkippedFrames = 1
