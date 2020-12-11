@@ -53,6 +53,18 @@ def initializeItems(nOfItems, gridSize, obstacles, obstacleRadius):
 
 
 
+def createCube(gridSize):
+    coveredArea = gridSize**2 * percetangeOfCoverage
+    nOfObstacles = int(coveredArea / obstacleRadius / 5)
+    obstacles = np.fix(np.random.random((nOfObstacles, 2)) * gridSize)
+    r_to_ds = delivery_station - obstacles
+    rnorms = np.linalg.norm(r_to_ds, axis=1)
+    obstacles = np.array([obstacles[i] for i in range(len(obstacles)) if rnorms[i] > 2 * obstacleRadius ])
+    return obstacles
+
+
+
+
 # TODO create a forest-like environment
 def initializeForest(percetangeOfCoverage, gridSize):
     pass
