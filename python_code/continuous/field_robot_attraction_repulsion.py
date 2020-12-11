@@ -11,7 +11,7 @@ from animateField import *
 
 
 
-nOfRobots = 20
+nOfRobots = 3
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -24,7 +24,7 @@ v = 0.3
 # TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
 obstacleRadius = 30
 gridSize = 1000
-fieldResolution = 100
+fieldResolution = 30 # decides how many arrows to plot
 
 
 T0 = 1
@@ -33,6 +33,7 @@ torque_radius = 100
 FI0 = 0.11#0.5
 FR0 = 0.1
 FO0 = 0.1
+forceandtorquecoeffs = [FR0, FI0, FO0, T0]
 deviation = 0.55
 
 
@@ -44,7 +45,7 @@ rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
 #N = 10000
-N = 500
+N = 2000
 # Initial values of x.
 x = np.zeros((1 * nOfRobots,N+1))
 #x[:,0] = np.random.random(nOfRobots) * gridSize
@@ -73,6 +74,7 @@ walkType = 'activeSwimming'
 #walkType = 'brownianMotion'
 
 
+print("Running simulation...")
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
     runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
                    v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
@@ -86,13 +88,16 @@ ax.grid()
 # the camera way
 camera = Camera(fig)
 
+print("Creating animation...")
 # item_positions_list changes, you need to send a list of lists to know the changes
-animateField(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_radius, ax, camera, gridSize, fieldResolution, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
+animateField(x, y, v, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_radius, ax, camera, gridSize, fieldResolution, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius, forceandtorquecoeffs)
 
 
+print("Animating...")
 animation = camera.animate()
+print("Saving...")
 animation.save('fieldanim=' +str(ni)  +'.mp4')
-
+print("Done.")
 # funcanim way
 #nOfSkippedFrames = 1
 #anim = matplotlib.animation.FuncAnimation(fig, frameUpdate, frames=N//nOfSkippedFrames, init_func=None, fargs=(x, y, robot_statesPerTime, N, nOfRobots, particle_radius, ax, item_positions_list, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius, nOfSkippedFrames,), blit=True, cache_frame_data=True) 

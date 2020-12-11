@@ -16,12 +16,15 @@ def calcTorqueRob(pos, robRobNeig, v_hat, nOfRobots, particle_radius):
             rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobotsInNeigh,1))
             r_rob_hat  = r_rob / rnorms_rob
             dots_rob = np.sum(v_hat[i] * r_rob_hat, axis=1).reshape((nOfRobotsInNeigh,1))
-            coefs = dots_rob / (rnorms_rob - particle_radius)**2 
+            coefs = dots_rob / (rnorms_rob - particle_radius)**2
             # NOTE maybe this should be without the square!
             # TODO try both!
+            # NOTE: calcRobField in animateField.py is built on this,
+            # if you change here you gotta change there as well
+            # if you want consistent fields
             crosses = np.cross(v_hat[i], r_rob_hat).reshape((nOfRobotsInNeigh, 1))
             particle_torques = coefs * crosses
-            torque_rob[i] = np.sum(particle_torques) 
+            torque_rob[i] = np.sum(particle_torques)
 
     return torque_rob
 
@@ -43,10 +46,13 @@ def calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius):
             dots_rob = np.sum(v_hat[i] * r_rob_hat, axis=1).reshape((nOfRobotsInNeigh,1))
             # NOTE maybe this should be without the square!
             # TODO try both!
-            coefs = dots_rob / (rnorms_rob - particle_radius)**2 
+            # NOTE: calcRobField in animateField.py is built on this,
+            # if you change here you gotta change there as well
+            # if you want consistent fields
+            coefs = dots_rob / (rnorms_rob - particle_radius)**2
             crosses = np.cross(v_hat[i], r_rob_hat).reshape((nOfRobotsInNeigh, 1))
             particle_torques = coefs * crosses
-            summ = np.sum(particle_torques) 
+            summ = np.sum(particle_torques)
             torque_rob[i] = v * np.array([np.cos(summ), np.sin(summ)])
     return torque_rob
 
