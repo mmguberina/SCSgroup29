@@ -9,22 +9,6 @@ from runSim import *
 
 
 
-### outline:
-# create x, y = meshgrid,
-# z = zeros.
-#
-# loop over robots,
-# calculate fields within their radius (and outside their volume)
-# add field to x,y that are within their radius
-#
-# loop over items,
-# calculate fields within their radius (and outside their volume)
-# add field to x,y that are within their radius
-# loop over environments,
-# calculate fields within their radius (and outside their volume)
-# add field to x,y that are within their radius
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from celluloid import Camera
@@ -188,7 +172,6 @@ def calcRobField(robot, v, particleRadius, torqueRadius, forceandtorquecoeffs, g
     torques = vnorm * np.array([np.cos(torquesum), np.sin(torquesum)]).reshape((nOfPoints, 2))
 
     # add forces and torques
-    breakpoint()
     fieldx[iToUse, jToUse] += FR0 * rhat[:,0]
     fieldy[iToUse, jToUse] += FR0 * rhat[:,1]
     fieldx[iToUse, jToUse] += FR0 * torques[:,0]
