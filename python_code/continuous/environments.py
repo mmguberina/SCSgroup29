@@ -53,6 +53,7 @@ def initializeItems(nOfItems, gridSize, obstacles, obstacleRadius):
 
 
 
+
 def createCube(gridSize):
     coveredArea = gridSize**2 * percetangeOfCoverage
     nOfObstacles = int(coveredArea / obstacleRadius / 5)

@@ -9,7 +9,7 @@ from environments import *
 from realismFunctions import *
 from getVelocitiesFromStates import *
 
-def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
+def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
                    v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
                    walkType, ni, trans_dif_T, rot_dif_T, deviation,                                         # random walk params
                    T0, FR0, FI0, FO0,                                                   # artificial potential field parameters 
@@ -231,7 +231,7 @@ walkType = 'activeSwimming'
 
 
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
-    runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
+    swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
                    v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
                    walkType, ni, trans_dif_T, rot_dif_T, deviation,                                          # random walk params
                    T0, FR0, FI0, FO0,                                                    # artificial potential field parameters 

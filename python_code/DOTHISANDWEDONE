@@ -1,0 +1,154 @@
+presentation structure
+======================
+
+1st slide - front page
+======================
+
+2nd slide - introduction to the introduction: the research question
+==================================================================
+the research question
+----------------------
+theoretical:
+"Can we apply apply knowleadge about active brownian swimmers 
+and other random walkers to create an efficient search/ 
+area coverage maximizing control algorithm for a swarm of
+simple robots?"
+
+practical:
+"There are many possible application for swarms of small, low-powered
+robots. We want to produce a simple simulation to be used as "proof of concept"
+for the above idea for one such application."
+
+
+3rd slide - short video of final simulation (15-20secs)
+=======================================================
+
+
+4th slide - more detailed motivation for theory
+===============================================
+- active brownian motion cleary works for active microswimmers
+---> giovanni reference
+- levy flights are used by various animal species and
+since they're still around clearly there's merit to this
+----> go on wiki for for 'levy flight foraging hypothesis',
+scroll, take some refs from there
+- ants and bees are individually dumb and almost blind,
+but their individual simplicity does not prevent them
+from reaching efficient complex solutions
+- brownian motion is good for covering a smaller area
+---> but we won't go into the math here 'cos of time constraints
+
+
+
+5th slide - more detailed motivation for the applications
+========================================================
+THE FOLLOWING POINTS ARE ESSENTIAL
+we are tackling the following formulation - 
+we want to automate something with robots.
+that something is:
+1. in an (effectively) unknown environment
+2. the environment has to be explored to achieve that something
+
+the following points are optional (but make our approach more 
+favourable over others)
+3. the environment lacks
+energy infrastructure (ocean floor, mars, siberia, etc)
+4. the environment is complex (a forest, damaged buiding, etc)
+
+our approach is the following
+use many simple, small, low powered robots to accomplish 
+the goal via their emergent behaviour
+
+examples:
+- search and rescue
+- collecting cigarette butts in public areas (closest to our model)
+- gathering data for scientific purposes
+- monitoring/ searching for pollution
+- surveillance (but i'd prefer we skip that one lel)
+
+6th slide - roadmap to the final algorithm
+=========================================
+1. explain robot and world model physically
+2. explain robot software architecture
+3. explain types of motion
+4. explain artificial potential fields
+5. explain the robotic algorithm 
+6. explain next future step: adding logic for self-adaptivity
+based on the environment observation, then optimize
+the governing parameters with the genetic alg and/or
+artificial network techniques
+
+
+7th slide - "physics"
+=====================
+just a screenshot of the animation, 
+then say it's 2d continuous and it's all circles
+
+
+8th slide - 
+=========
+- sample (small and simple) finite state machine graph 
+to explain what that is
+
+
+9-11th slides - animations + plots of 3 types of random motion
+=============================================================
+- also stick a formula on the screen just to have it there
+so that it looks more #serious
+
+
+12th slide - artificial potential fields
+=======================================
+- we're not using dynamics (no masses or accelerations, just
+kinematics) 'cos it complicates matters and this is just proof of concept 
+- 4 animations:
+1) only robots, shows dispersion
+2) only 1/few robot without noise and obstacles to show operating principle
+3) add items into the mix just for fun (it's off in this version of
+the application as it's better to turn off obstacle forces when picking up
+items (which are in line of sight anyway. in data collecting apps, you don't
+pick items and then item forces would be super super important)
+4) show example when this fails hard to show that you need to 
+do more work to get quality super-diffusive behaviour (local minima problem)
+
+
+13th slide - the algorithm
+==========================
+- finite state machine graph of the final version
+---> i'll do it in tikz 'cos it will take 2mins and it will
+be a slick-looking rasterized pdf (unless the pdf is a problem, 
+in which case let's just take an hd screenshot)
+
+
+
+14th slide - fancy optimization to achieve self-adaptivity
+===========================================================
+- just boring bullets stating what's to come (max 15 words tho)
+- but then throw in a meme which conveys that we didn't do that haha
+stay tuned fellas
+
+
+
+15th slide - roadmap to tests
+=============================
+1) average msd for various random walk parameters
+both with just robots roaming and with the whole sim
+
+FUNDAMENTAL PROBLEM
+HOW THE FUCK DO WE DO THIS WHEN THERE'S A TRILLION PARAMETERS TO TUNE
+-> idea: have "standard model" then tune 1 parameter at a time
+and show how stuff changes
+
+how what changes?
+---> performance metrics :D
+
+combine the things below into fun graphs
+a) number of items collected
+b) number of robots successfully returned to base
+c) percentage of covered area (without the obstacles obviously)
+d) n of times the robots collided with other robots and/or obstacles
+
+and then have slides with these graphs
+TODO create and select these graphs
+
+end
