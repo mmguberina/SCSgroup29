@@ -1,21 +1,85 @@
 in rough order of importance
 
+##############################################
+# fields things
+##############################################
+
+
 1. do the the artificial field plots which clearly show how they work
 	--> 1 robot, 2 obstacles type of plot for that purpose
 	--> of course there will be (at least) one big and sexy animation
 		of it in action for a whole simulation (at the very least because
 		it's so damn pretty)
 
+
 2. figure out what to change to make the work as indended (99% sure
 it's just down to signs, everything is defined with robot-something radii-vectors,
 just make sure that the radial fields have the appropriate directions and
 that the strength are reasonable)
 
+
 3. come up with cheap hack which limits total field stregth when 2 obstackles 
 overlap:
 	3.1. draw picture, do geometry, do few sample calcs and call it day if it 
-		 it checks out on 
+		 it checks out 
 	3.2. find out how to efficiently indentify overlapping obstacles
 		---> since they don't move you need to do that before you even run the sim,
-			 it's all gucci if you don't need to recalculate that all the time
-	3.3 pretend they won't form a closed loops 
+			 it's all gucci if you don't need to recalculate that all the time.
+			 in other words, calc that in the environments object generating function.
+			 thus this is just down to having the objects not (just) as a set (or whatever),
+			 but also as a dictionary where values are the overlapping neighbours
+	3.3. pretend they won't form a closed loops haha 
+
+
+
+
+##############################################
+# testing  prep
+##############################################
+4. (finally) code the sample environments (jeez)
+
+5. eyeball parameters with which to do the testing.
+the absolute minimum here is changing the number of robots
+and the force coefficients. possibly do a linear version and a square version
+separately -- the silicon doesn't have feelings, it's ok to burn it with your folly
+
+6. make all robots go back to base after some number of timesteps.
+wait for the same amount of timesteps for them to return.
+and yes this is yet another parameter that should be an independent variable.
+(some configurations will be finished sooner that others).
+
+7. forbid robots from leaving the grid. if they don't get stuck at the limits
+i really don't give a shit how it's implemented at this point.
+
+
+
+##############################################
+# testing  
+##############################################
+
+4. collect all data produced by the sim (it's prolly all there already,
+but put it a nice pandas data frame) and write it to a file.
+but i mean all of it. the goal is to be able to do not need to
+run sims again if you thought of a new plot.
+
+5. write parameters of simulations to be run in a huge ass list of tuples.
+pls try to do it with enums or something as the probability of fucking up
+VERY important indeces there is almost 100%
+
+6. write the multiprocessing code.
+if you did 5 correctly, the distribution problem will be
+reduced to selecting the right array slice (i.e. it won't exist)
+
+
+
+##############################################
+# data analysis
+##############################################
+
+the metrics are
+a) number of items collected
+b) number of robots successfully returned to base
+c) percentage of covered area (without the obstacles obviously)
+d) n of times the robots collided with other robots and/or obstacles
+
+find ways to plot this so that the graphs are fun
