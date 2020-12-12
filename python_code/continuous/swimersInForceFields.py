@@ -21,7 +21,8 @@ def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, g
     item_positions_list = np.array(list(item_positions_set))
     item_positions_listPerTime = [[0, item_positions_list]]
     nOfItems = len(item_positions_set)
-    fi = np.random.random(nOfRobots) * 2*np.pi
+    #fi = np.random.random(nOfRobots) * 2*np.pi
+    fi = np.array([np.pi / 2])
 
     # 0 is search, 1 is delivering, 2 is going to pick up a spotted item, 3 if they are unstucking themselves
     # 4 is levy flight (for us that's going in one direction for some amount of time)
@@ -126,7 +127,7 @@ def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, g
         # TODO put the coefficients in the force fuctions
         # and make them < v! (otherwise they will "discontinuously" jump)
 
-        torque_obs = FO0 * calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, nOfRobots, obstacleRadius)
+        torque_obs = FO0  * calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, nOfRobots, obstacleRadius)
 
         # TODO TODO TODO CHECK WHETHER THIS MAKES SENSE
         #fi = fi - torque_obs
@@ -142,6 +143,7 @@ def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, g
         x[:, step+1] = x[:, step+1] - force_item[:,0] 
         x[:, step+1] = x[:, step+1] + force_obs[:,0] 
         x[:, step+1] = x[:, step+1] + torque_obs[:,0] 
+        #x[:, step+1] = x[:, step+1] - torque_obs[:,0] 
         x[:, step+1] = x[:, step+1] % gridSize
 
         y[:, step+1] = y[:,step] +  v * v_hat[:,1] 
@@ -150,6 +152,7 @@ def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, g
         y[:, step+1] = y[:,step+1] - force_item[:,1] 
         y[:, step+1] = y[:,step+1] + force_obs[:,1] 
         y[:, step+1] = y[:,step+1] + torque_obs[:,1] 
+        #y[:, step+1] = y[:,step+1] - torque_obs[:,1] 
         y[:, step+1] = y[:,step+1] % gridSize
 
         
@@ -171,13 +174,15 @@ def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, g
 
 
 
-nOfRobots = 30
+#nOfRobots = 30
+nOfRobots = 1
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
 nis = [np.pi *2, np.pi * 0.02, np.pi * 0.002]
 ni = nis[1] 
-v = 0.05
+ni = 0
+v = 0.03
 #v = 0.3
 # Total time.
 
@@ -186,10 +191,11 @@ obstacleRadius = 30
 gridSize = 500
 T0 = 1
 particle_radius = 3
-torque_radius = 20 
+#torque_radius = 20 
+torque_radius = 50
 FI0 = 0.11#0.5
 FR0 = 1
-FO0 = 1
+FO0 = 0.5
 deviation = 0.55
 
 nOfUnstuckingSteps = 600
@@ -199,18 +205,15 @@ stuckThresholdDistance = v * 6
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 3000
+N = 6000
 # Initial values of x.
 x = np.zeros((1 * nOfRobots,N+1))
-#x[:,0] = np.random.random(nOfRobots) * gridSize
-x[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+#x[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+x[:,0] = gridSize // 2 
 y = np.zeros((1 * nOfRobots,N+1))
-#y[:,0] = np.random.random(nOfRobots) * gridSize
-y[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
-#fi = np.zeros((1 * nOfRobots,N+1))
-#fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
+#y[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+y[:,0] = gridSize // 2 - 3*obstacleRadius
 robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
-#x[:, 0] = 0.0
 
 
 # 5 items
@@ -221,7 +224,12 @@ nOfItems = 0
 percetangeOfCoverage = 0.01
 delivery_station = np.array([0,0])
 
-obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
+#obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
+obstacles = np.array([[gridSize // 2 - 1.5 * obstacleRadius, gridSize // 2], 
+                     [gridSize // 2 + 1.5 * obstacleRadius, gridSize // 2],
+                     [gridSize // 2 - 3.5 * obstacleRadius, gridSize // 2],
+                     [gridSize // 2, gridSize // 2],
+                     [gridSize // 2 + 3.5 * obstacleRadius, gridSize // 2]])
 
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 

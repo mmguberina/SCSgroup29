@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ffmpeg -f x11grab -s 1920x1080 -i :0 -f alsa -i default on_continuous_code.mkv
+ffmpeg -f x11grab -s 1920x1080 -i :0 -f alsa -i default force_explanation.mkv

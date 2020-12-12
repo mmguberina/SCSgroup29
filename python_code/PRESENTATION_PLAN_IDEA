@@ -3,7 +3,7 @@ presentation structure
 
 
 ################################################################
-# first logical segment
+# first logical segment: introduction & motivation
 ################################################################
 
 1st slide - front page
@@ -74,7 +74,7 @@ examples:
 
 
 ################################################################
-# second logical segment
+# second logical segment: the thing
 ################################################################
 
 6th slide - roadmap to the final algorithm
@@ -141,7 +141,7 @@ stay tuned fellas
 
 
 ################################################################
-# third logical segment
+# third logical segment: testing & discussion 
 ################################################################
 
 
@@ -155,7 +155,7 @@ both with just robots roaming and with the whole sim
 
 
 so yeah...
-now enter the problematic territory
+now we enter the problematic territory
 
 how to test?
 -> idea: have "standard model" then tune 1 parameter at a time
@@ -188,7 +188,7 @@ so what type of environments are we talking about?
 ---------------------------------------------------
 - porous environemnt from giovanni paper 
 - rectangular arena (to emulate building environment)
-repeat the below ones for different obstacle sizes
+repeat the below ones for different obstacle and grid sizes
 - sparse environment
 - normal cluttering level
 - highly clusterred 
@@ -199,7 +199,7 @@ of premade ones. the last 3 are already generated.
 
 which parameters are to be used as independent variables?
 ---------------------------------------------------------
-as much as possible
+as much of the available ones as possible
 the number of robots and force and torque coefficients.
 state transitions parameters won't be in game rn,
 that's the self-tunability part to be developed later
@@ -214,3 +214,9 @@ TODO create and select these graphs
 
 
 end
+
+[and yes your thinking is correct, this is (possibly too) long,
+there's stuff missing. i'll just say no matter when we finish this,
+i'm totaly ok with sending an empty pdf as report (this version is not graded anyway).
+by that i mean i'm certainly not gonna write it for wednesday (i will do writing
+later of course)]

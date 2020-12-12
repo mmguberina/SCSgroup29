@@ -11,12 +11,18 @@ in rough order of importance
 		of it in action for a whole simulation (at the very least because
 		it's so damn pretty)
 
+========> yeah just change the params bruh this is done already
 
 2. figure out what to change to make the work as indended (99% sure
 it's just down to signs, everything is defined with robot-something radii-vectors,
 just make sure that the radial fields have the appropriate directions and
 that the strength are reasonable)
 
+=========> yeah it looks reasonable, and the ratio of the forces is key.
+			the whole point of testing is to find those parameters
+
+============> it is essential to split the force and torque coefficients tho!
+---> but enforce some minimum for robots as they should not collide
 
 3. come up with cheap hack which limits total field stregth when 2 obstackles 
 overlap:
@@ -29,7 +35,13 @@ overlap:
 			 thus this is just down to having the objects not (just) as a set (or whatever),
 			 but also as a dictionary where values are the overlapping neighbours
 	3.3. pretend they won't form a closed loops haha 
-
+ooorrrrrrrrrrrr
+just hard limit the generated force ?
+---> no, that does not solve the full problem
+right
+so the fundamental problem is the fact that you are using individual obstacles
+to calculate stuff in the first place
+that's not how te sensory thing would work 
 
 
 

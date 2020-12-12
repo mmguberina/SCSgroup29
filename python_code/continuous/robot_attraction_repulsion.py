@@ -7,7 +7,7 @@ from animate import *
 from environments import *
 from runSim import *
 from funcAnimate import *
-
+import pandas as pd
 
 
 nOfRobots = 10
@@ -73,6 +73,17 @@ x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
                    walkType, ni, trans_dif_T, rot_dif_T,                                          # random walk params
                    T0, FR0, FI0, FO0, deviation,                                                   # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)       # unstucking parameters
+
+
+
+
+# save all of it into a nice pandas data frame
+# you need to save everything that does into animate!! 
+# everything but params is indexed by time
+# solution: write everything time-dapendent into the data frame,
+#   and write all else into a separate plain-text file
+# it will work if you put it all in a dictionary!
+
 
 fig, ax = plt.subplots()
 ax.grid()

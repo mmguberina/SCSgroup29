@@ -6,14 +6,9 @@ import matplotlib
 from animate import *
 from environments import *
 from runSim import *
-
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-from celluloid import Camera
 from matplotlib.patches import Circle
 from matplotlib.collections import PatchCollection
+
 
 def animateField(x, y, v, robot_statesPerTime, item_positions, N, nOfRobots, particle_radius, ax, camera, gridSize, fieldResolution, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius, forceandtorquecoeffs):
     item_positions_listPerTime.reverse()
