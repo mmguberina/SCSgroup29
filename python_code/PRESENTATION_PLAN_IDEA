@@ -1,6 +1,11 @@
 presentation structure
 ======================
 
+
+################################################################
+# first logical segment
+################################################################
+
 1st slide - front page
 ======================
 
@@ -66,6 +71,12 @@ examples:
 - monitoring/ searching for pollution
 - surveillance (but i'd prefer we skip that one lel)
 
+
+
+################################################################
+# second logical segment
+################################################################
+
 6th slide - roadmap to the final algorithm
 =========================================
 1. explain robot and world model physically
@@ -129,26 +140,77 @@ stay tuned fellas
 
 
 
+################################################################
+# third logical segment
+################################################################
+
+
 15th slide - roadmap to tests
 =============================
 1) average msd for various random walk parameters
 both with just robots roaming and with the whole sim
+2) explain the testing strategy
+3&4) show plots & explain and discuss results
 
-FUNDAMENTAL PROBLEM
-HOW THE FUCK DO WE DO THIS WHEN THERE'S A TRILLION PARAMETERS TO TUNE
+
+
+so yeah...
+now enter the problematic territory
+
+how to test?
 -> idea: have "standard model" then tune 1 parameter at a time
 and show how stuff changes
 
-how what changes?
----> performance metrics :D
 
-combine the things below into fun graphs
+how what changes?
+----------------
+---> performance metrics:
 a) number of items collected
 b) number of robots successfully returned to base
 c) percentage of covered area (without the obstacles obviously)
 d) n of times the robots collided with other robots and/or obstacles
 
+
+but what is a standard model? 
+-----------------------------
+--> multiple different models;
+this amount to finding cases of interesting combinations of independent
+variables in specific types of environments. 
+then fix all but one of them, change the unfixed one, see what happens.
+will this cover all possible parameters? of course not.
+the GA is supposed to be used to find good parameter combinations
+for specific types of environments.
+idk if we'll get to use it given the time and date, but one can hope.
+however, we still need to show what changes when you change a parameter.
+bottom line: the more we get to do the better on this front
+
+so what type of environments are we talking about?
+---------------------------------------------------
+- porous environemnt from giovanni paper 
+- rectangular arena (to emulate building environment)
+repeat the below ones for different obstacle sizes
+- sparse environment
+- normal cluttering level
+- highly clusterred 
+if (time-wise) possible generate these enviroments, if not roll with like 2-4
+of premade ones. the last 3 are already generated.
+
+
+
+which parameters are to be used as independent variables?
+---------------------------------------------------------
+as much as possible
+the number of robots and force and torque coefficients.
+state transitions parameters won't be in game rn,
+that's the self-tunability part to be developed later
+
+
+we ran the sims, got the data, now what?
+----------------------------------------
+combine the things below into fun graphs
 and then have slides with these graphs
 TODO create and select these graphs
+
+
 
 end

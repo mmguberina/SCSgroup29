@@ -1,0 +1,21 @@
+in rough order of importance
+
+1. do the the artificial field plots which clearly show how they work
+	--> 1 robot, 2 obstacles type of plot for that purpose
+	--> of course there will be (at least) one big and sexy animation
+		of it in action for a whole simulation (at the very least because
+		it's so damn pretty)
+
+2. figure out what to change to make the work as indended (99% sure
+it's just down to signs, everything is defined with robot-something radii-vectors,
+just make sure that the radial fields have the appropriate directions and
+that the strength are reasonable)
+
+3. come up with cheap hack which limits total field stregth when 2 obstackles 
+overlap:
+	3.1. draw picture, do geometry, do few sample calcs and call it day if it 
+		 it checks out on 
+	3.2. find out how to efficiently indentify overlapping obstacles
+		---> since they don't move you need to do that before you even run the sim,
+			 it's all gucci if you don't need to recalculate that all the time
+	3.3 pretend they won't form a closed loops 
