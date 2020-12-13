@@ -6,9 +6,9 @@ from realismFunctions import *
 from getVelocitiesFromStates import *
 
 def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
-                   v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
+                   v, particle_radius, torque_radius, obstacles,obstacleRadius,obstacleClusters,         # environment robot physical params 
                    walkType, ni, trans_dif_T, rot_dif_T, deviation,                                         # random walk params
-                   T0, FR0, FI0, FO0,                                                   # artificial potential field parameters 
+                   T0, FR0, FI0, FO0, TR0, TO0,                                                   # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance       # unstucking parameters
                    ):
 
@@ -175,16 +175,18 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 
         # TODO check signs, strengths and other stuff
         force_rob = FR0 * calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius)
-        torque_rob = FR0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
+        torque_rob = TR0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
 
-        force_item = FI0 * calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius)
+        #force_item = FI0 * calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius)
 
-        force_obs = FO0 * calcForceObs(v, pos, robObsNeig,  nOfRobots, particle_radius, obstacleRadius)
+        #force_obs = FO0 * calcForceObs(v, pos, robObsNeig,  nOfRobots, particle_radius, obstacleRadius)
+        force_obs = FO0 * calcForceObsClusters(v, pos, robObsNeig, obstacleClusters, nOfRobots, particle_radius, obstacleRadius)
+        print(force_obs)
 
         # TODO put the coefficients in the force fuctions
         # and make them < v! (otherwise they will "discontinuously" jump)
 
-        torque_obs = FO0 * calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, nOfRobots, obstacleRadius)
+        torque_obs = TO0 * calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, explorers, obstacleRadius, nOfRobots, particle_radius)
 
         # TODO TODO TODO CHECK WHETHER THIS MAKES SENSE
         #fi = fi - torque_obs
@@ -197,7 +199,7 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
         x[:, step+1] = x[:,step] +  v * v_hat[:,0]
         x[:, step+1] = x[:, step+1] + force_rob[:,0] 
         x[:, step+1] = x[:, step+1] + torque_rob[:,0] 
-        x[:, step+1] = x[:, step+1] - force_item[:,0] 
+        #x[:, step+1] = x[:, step+1] - force_item[:,0] 
         x[:, step+1] = x[:, step+1] + force_obs[:,0] 
         x[:, step+1] = x[:, step+1] + torque_obs[:,0] 
         x[:, step+1] = x[:, step+1] % gridSize
@@ -205,7 +207,7 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
         y[:, step+1] = y[:,step] +  v * v_hat[:,1] 
         y[:, step+1] = y[:,step+1] + force_rob[:,1] 
         y[:, step+1] = y[:, step+1] + torque_rob[:,1] 
-        y[:, step+1] = y[:,step+1] - force_item[:,1] 
+        #y[:, step+1] = y[:,step+1] - force_item[:,1] 
         y[:, step+1] = y[:,step+1] + force_obs[:,1] 
         y[:, step+1] = y[:,step+1] + torque_obs[:,1] 
         y[:, step+1] = y[:,step+1] % gridSize

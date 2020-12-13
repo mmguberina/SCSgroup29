@@ -29,17 +29,17 @@ def indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius):
         r_obs = obstacles[i] - obstacles
         rnorms_obs = np.linalg.norm(r_obs, axis=1)
         # i will add the obstacle itself in the value of that obstacle in the dict
-        justObs = np.array([obstacles[o] for o in range(nOfObstacles0) 
-                                            if rnorms_obs < 2*obstacleRadius + 2*particle_radius])
+        justObs = np.array([obstacles[o] for o in range(nOfObstacles) 
+                                            if rnorms_obs[o] < 2*obstacleRadius + 2*particle_radius])
         # using a set as a cheap way to stop overcounting
-        clusterAsSet = set(justObs)
+        clusterAsSet = set()
 
         # and now calc and add the spliced points as well
         for j in range(len(justObs)):
             # it's clear when you draw it
             # also this thing gives you the obstacle itself, which is what we're going for here actually
             spliced = (justObs[j] - justObs) / 2 + justObs
-            spliced = set(map(tuple(spliced)))
+            spliced = set(map(tuple, spliced))
             clusterAsSet.update(spliced)
 
 

@@ -22,13 +22,29 @@ v = 0.3
 
 # TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
 obstacleRadius = 30
-gridSize = 1700
+gridSize = 700
 T0 = 1
 particle_radius = 5
 torque_radius = 100 
 FI0 = 1.0#0.5
-FR0 = 0.8
-FO0 = 0.4
+FR0 = 1.0
+FO0 = 1.0
+
+TI0 = 1.0#0.5
+TR0 = 1.0
+TO0 = 1.0
+
+
+FI0 = 0.3#0.5
+FR0 = 1.0
+FO0 = 0.3
+
+TI0 = 0.0#0.5
+TR0 = 0.5
+TO0 = 0.0
+
+
+#FO0 = 1.0
 deviation = 0.55
 
 nOfUnstuckingSteps = 600
@@ -38,14 +54,15 @@ stuckThresholdDistance = v * 6
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 10000
+#N = 10000
+N = 5000
 # Initial values of x.
 x = np.zeros((1 * nOfRobots,N+1))
 #x[:,0] = np.random.random(nOfRobots) * gridSize
-x[:,0] = 2 * np.random.random(nOfRobots) - 1 + 500
+x[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
 y = np.zeros((1 * nOfRobots,N+1))
 #y[:,0] = np.random.random(nOfRobots) * gridSize
-y[:,0] = 2 * np.random.random(nOfRobots) - 1 + 500
+y[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
 #fi = np.zeros((1 * nOfRobots,N+1))
 #fi[:,0] = np.random.random(nOfRobots) * 2*np.pi
 robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
@@ -53,12 +70,13 @@ robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 
 
 # 5 items
-nOfItems = 50
+nOfItems = 30
 
 percetangeOfCoverage = 0.01
 delivery_station = np.array([gridSize // 2, gridSize // 2])
 
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
+obstacleClusters = indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius)
 
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
@@ -69,9 +87,9 @@ walkType = 'activeSwimming'
 
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
     runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
-                   v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
-                   walkType, ni, trans_dif_T, rot_dif_T,                                          # random walk params
-                   T0, FR0, FI0, FO0, deviation,                                                   # artificial potential field parameters 
+                   v, particle_radius, torque_radius, obstacles,obstacleRadius,obstacleClusters,         # environment robot physical params 
+                   walkType, ni, trans_dif_T, rot_dif_T,deviation,                                          # random walk params
+                   T0, FR0, FI0, FO0,TR0, TO0,                                                    # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)       # unstucking parameters
 
 

@@ -10,7 +10,7 @@ from realismFunctions import *
 from getVelocitiesFromStates import *
 
 def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
-                   v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
+                   v, particle_radius, torque_radius, obstacles,obstacleRadius,obstacleClusters,         # environment robot physical params 
                    walkType, ni, trans_dif_T, rot_dif_T, deviation,                                         # random walk params
                    T0, FR0, FI0, FO0,                                                   # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance       # unstucking parameters
@@ -122,7 +122,8 @@ def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, g
 
         force_item = FI0 * calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius)
 
-        force_obs = FO0 * calcForceObs(v, pos, robObsNeig,  nOfRobots, particle_radius, obstacleRadius)
+        #force_obs = FO0 * calcForceObs(v, pos, robObsNeig,  nOfRobots, particle_radius, obstacleRadius)
+        force_obs = FO0 * calcForceObsClusters(v, pos, robObsNeig,  obstacleClusters, nOfRobots, particle_radius, obstacleRadius)
 
         # TODO put the coefficients in the force fuctions
         # and make them < v! (otherwise they will "discontinuously" jump)
@@ -237,10 +238,12 @@ item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, ob
 walkType = 'activeSwimming'
 #walkType = 'brownianMotion'
 
+obstacleClusters = indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius)
+
 
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
     swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
-                   v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
+                   v, particle_radius, torque_radius, obstacles,obstacleRadius, obstacleClusters,        # environment robot physical params 
                    walkType, ni, trans_dif_T, rot_dif_T, deviation,                                          # random walk params
                    T0, FR0, FI0, FO0,                                                    # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)       # unstucking parameters
