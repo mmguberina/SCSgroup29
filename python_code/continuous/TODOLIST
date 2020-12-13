@@ -35,25 +35,22 @@ overlap:
 			 thus this is just down to having the objects not (just) as a set (or whatever),
 			 but also as a dictionary where values are the overlapping neighbours
 	3.3. pretend they won't form a closed loops haha 
-ooorrrrrrrrrrrr
-just hard limit the generated force ?
----> no, that does not solve the full problem
-right
-so the fundamental problem is the fact that you are using individual obstacles
-to calculate stuff in the first place
-that's not how te sensory thing would work 
-
+-------> found a reasonable hack i won't question. 
 
 
 ##############################################
 # testing  prep
 ##############################################
 4. (finally) code the sample environments (jeez)
+------> yeah i'm not fucking doing that. let them be sparse,
+normal and cluttered because i have that already.
+if someone else feels like doing that be my guest.
 
 5. eyeball parameters with which to do the testing.
 the absolute minimum here is changing the number of robots
 and the force coefficients. possibly do a linear version and a square version
-separately -- the silicon doesn't have feelings, it's ok to burn it with your folly
+separately -- the silicon doesn't have feelings, it's ok to burn it with your folly.
+thank god this down to literally 3 ascii charcters
 
 6. make all robots go back to base after some number of timesteps.
 wait for the same amount of timesteps for them to return.
@@ -73,10 +70,12 @@ i really don't give a shit how it's implemented at this point.
 but put it a nice pandas data frame) and write it to a file.
 but i mean all of it. the goal is to be able to do not need to
 run sims again if you thought of a new plot.
+--> pandas for timesteped stuff, else in a text file
+which is like a csv enhanced to a dictionary esentially
 
 5. write parameters of simulations to be run in a huge ass list of tuples.
 pls try to do it with enums or something as the probability of fucking up
-VERY important indeces there is almost 100%
+there is almost 100%
 
 6. write the multiprocessing code.
 if you did 5 correctly, the distribution problem will be
@@ -89,9 +88,13 @@ reduced to selecting the right array slice (i.e. it won't exist)
 ##############################################
 
 the metrics are
-a) number of items collected
-b) number of robots successfully returned to base
-c) percentage of covered area (without the obstacles obviously)
-d) n of times the robots collided with other robots and/or obstacles
+a) number of items collected - already a returned
+b) number of robots successfully returned to base - near trivial implementation 
+---> after some timestep just put all of them in state return_to_base.
+conveniently, they drop items from that state already
+c) percentage of covered area (without the obstacles obviously) - infer this from data 
+d) n of times the robots collided with other robots and/or obstacles - infer this from data,
+i don't feel like coding it up rn. or just skip this metric for now (let's be real here).
 
 find ways to plot this so that the graphs are fun
+-----> do that as a group and just generate the data for now

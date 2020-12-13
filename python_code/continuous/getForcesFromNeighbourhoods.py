@@ -121,7 +121,8 @@ def calcTorqueObs(pos, robObsNeig, v_hat, nOfRobots, obstacleRadius):
         # NOTE: calcObsField in animateField.py is built on this,
         # if you change here you gotta change there as well
         # if you want consistent fields
-        coefs_obs = dots_obs / (rnorms_obs - obstacleRadius)**2 
+        #coefs_obs = dots_obs / (rnorms_obs - obstacleRadius)**2 
+        coefs_obs = dots_obs / (rnorms_obs - obstacleRadius - particle_radius)**2 
         # try repelling them now
         # crosses v_i with r_i and does so for all i
         crosses_obs = np.cross(v_hat[i], r_obs_hat).reshape((nOfObssInNeigh, 1))
@@ -248,7 +249,8 @@ def calcForceObs(v, pos, robObsNeig, nOfRobots, particle_radius, obstacleRadius)
             # NOTE: calcObsField in animateField.py is built on this,
             # if you change here you gotta change there as well
             # if you want consistent fields
-            obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius)**2 for p in range(nOfObssInNeigh)])
+            #obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius)**2 for p in range(nOfObssInNeigh)])
+            obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius - particle_radius)**2 for p in range(nOfObssInNeigh)])
             force =  np.sum(obs_forces, axis=0) 
             # TODO rewrite this last thing in vector form for the speeeed
             force_obs[i] = force if np.abs(np.linalg.norm(force)) < v else v * np.sign(force)
@@ -257,4 +259,45 @@ def calcForceObs(v, pos, robObsNeig, nOfRobots, particle_radius, obstacleRadius)
 
 
 
+def calcForceObsClusters(v, pos, robObsNeig, obstacleClusters, nOfRobots, particle_radius, obstacleRadius):
+
+    force_obs = np.zeros((nOfRobots,2))
+    for i in range(nOfRobots):
+        nOfObssInNeigh = len(robObsNeig[i])
+        if nOfObssInNeigh == 0:
+            force_obs[i] = np.zeros(2)
+        else:
+            # go through each cluster
+            # and blacklist checked obstacles as you go along
+
+            blackList = set()
+            for obstacle in robObsNeig[i]:
+                clusterAsSet = obstacleClusters[obstacle].difference(blackList)
+                nInCluster = len(clusterAsList)
+                if nInCluster == 0:
+                    continue
+                # TODO FINISH THIS
+                blackList.update(obstacleClusters[obstacle])
+                clusterAsList = np.array(list(map(list, clusterAsSet)))
+                r_obs = pos[i] - clusterAsList
+                rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nInCluster,1))
+                r_obs_hat  = r_obs / rnorms_obs
+                obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius)**2 for p in range(nOfObssInNeigh)])
+
+                
+
+            r_obs = pos[i] - np.array(list(map(list, robObsNeig[i])))
+            rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObssInNeigh,1))
+            r_obs_hat  = r_obs / rnorms_obs
+            # NOTE maybe this should be without the square!
+            # TODO try both!
+            # NOTE: calcObsField in animateField.py is built on this,
+            # if you change here you gotta change there as well
+            # if you want consistent fields
+            obs_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius)**2 for p in range(nOfObssInNeigh)])
+            force =  np.sum(obs_forces, axis=0) 
+            # TODO rewrite this last thing in vector form for the speeeed
+            force_obs[i] = force if np.abs(np.linalg.norm(force)) < v else v * np.sign(force)
+
+    return force_obs
 
