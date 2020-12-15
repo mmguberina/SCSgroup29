@@ -44,17 +44,22 @@ def do5Tests(jobQueue):
                         nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)
 
 
-            dataframe_x = pd.DataFrame({'x':x})
-            dataframe_y = pd.DataFrame({'y':y})
-            dataframe_rs = pd.DataFrame({'robstate':robot_statesPerTime})
 
             dataFileName = "./data/" + str(nOfRobots) + "_" + str(walkType) + str(ni) + "_" \
                             + str(deviation) + "_" + str(percetangeOfCoverage) \
                             + "_" + str(i+1)
                            
-            dataframe_x.to_csv(dataFileName + "_x.csv")
-            dataframe_y.to_csv(dataFileName + "_y.csv")
-            dataframe_rs.to_csv(dataFileName + "_st.csv")
+            fid_x = open(dataFileName + "_x.csv", "w")
+            fid_y = open(dataFileName + "_y.csv", "w")
+            fid_rs = open(dataFileName + "_rs.csv", "w")
+
+            x.tofile(fid_x)
+            y.tofile(fid_y)
+            rs.tofile(fid_rs)
+
+            fid_x.close()
+            fid_y.close()
+            fid_rs.close()
 
             writeToFilee(dataFileName, N, nOfRobots, gridSize, v, particle_radius, torque_radius,\
         obstacleRadius, walkType, ni, deviation, T0, FR0, FI0, FO0,TR0, TO0,\
