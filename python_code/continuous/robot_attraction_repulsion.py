@@ -22,13 +22,13 @@ v = 0.3
 
 # TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
 obstacleRadius = 30
-gridSize = 700
+gridSize = 1300
 T0 = 1
 particle_radius = 5
 torque_radius = 100 
-FI0 = 1.0#0.5
-FR0 = 1.0
-FO0 = 1.0
+FI0 = 0.5#0.5
+FR0 = 0.5
+FO0 = 0.5
 
 TI0 = 1.0#0.5
 TR0 = 1.0
@@ -37,7 +37,7 @@ TO0 = 1.0
 
 FI0 = 0.3#0.5
 FR0 = 1.0
-FO0 = 0.3
+FO0 = 0.5
 
 TI0 = 0.0#0.5
 TR0 = 0.5
@@ -48,8 +48,8 @@ TO0 = 0.0
 deviation = 0.55
 
 nOfUnstuckingSteps = 600
-stuckThresholdTime = 200
-stuckThresholdDistance = v * 6
+stuckThresholdTime = 300
+stuckThresholdDistance = v * 500
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
@@ -70,9 +70,9 @@ robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 
 
 # 5 items
-nOfItems = 30
+nOfItems = 10
 
-percetangeOfCoverage = 0.01
+percetangeOfCoverage = 0.001
 delivery_station = np.array([gridSize // 2, gridSize // 2])
 
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
@@ -80,8 +80,8 @@ obstacleClusters = indentifyObstacleClusters(obstacles, obstacleRadius, particle
 
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
-#walkType = 'levyFlight'
-walkType = 'activeSwimming'
+walkType = 'levyFlight'
+#walkType = 'activeSwimming'
 #walkType = 'brownianMotion'
 
 

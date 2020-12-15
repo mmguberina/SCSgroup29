@@ -15,7 +15,9 @@ def initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_st
 
 # get clusters
 # store the spliced points as well (in the value ndarray)
-def indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius):
+# NOTE this is bad and it does not work
+# but the idea is good so fix it eventually
+def indentifyObstacleClustersWithSplits(obstacles, obstacleRadius, particle_radius):
     # store them in a dictionary
     # keep list of neighbours of every obstacle
     # you'll need to do blacklist when using this, but this will work nicely
@@ -49,6 +51,28 @@ def indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius):
     return obstacleClusters
 
 
+def indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius):
+    # store them in a dictionary
+    # keep list of neighbours of every obstacle
+    # you'll need to do blacklist when using this, but this will work nicely
+    obstacleClusters = {tuple(obstacle):[] for obstacle in obstacles}
+    nOfObstacles = len(obstacles)
+
+    # this is in fact not completely correct in terms of indentifying clusters
+    # but i think it effectively correct for the sim purposes
+    # (i don't feel like making it 100% correct rn)
+    for i in range(len(obstacles)):
+        r_obs = obstacles[i] - obstacles
+        rnorms_obs = np.linalg.norm(r_obs, axis=1)
+        # i will add the obstacle itself in the value of that obstacle in the dict
+        justObs = np.array([obstacles[o] for o in range(nOfObstacles) 
+                                            if rnorms_obs[o] < 2*obstacleRadius + 2*particle_radius])
+
+
+        obstacleClusters[tuple(obstacles[i])] = set(map(tuple, justObs))
+
+
+    return obstacleClusters
 
 # NOTE items must be initialize so that they don't overlap with obstacles
 # this is disgustingly bad from an efficiency standpoint

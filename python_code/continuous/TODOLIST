@@ -1,5 +1,8 @@
 in rough order of importance
 
+yeah i'm leaving this as this is all TBD
+at some later point 
+
 ##############################################
 # fields things
 ##############################################
@@ -38,6 +41,7 @@ overlap:
 -------> found a reasonable hack i won't question. 
 -------> yeah it didn't exactly work and i am mentally unable to fuck with this any longer
 -------> it sorta worked and the torques part is what it absolutely necessary to get this thing to work
+=======> yeah i didn't manage to fix it, we're rolling just with run of the mill (wrong) repulsive force
 
 
 ##############################################
@@ -53,16 +57,20 @@ the absolute minimum here is changing the number of robots
 and the force coefficients. possibly do a linear version and a square version
 separately -- the silicon doesn't have feelings, it's ok to burn it with your folly.
 thank god this down to literally 3 ascii charcters
+-----> forces are settled and there is just the 3 mentioned types of environment * 3 sizes
 
 6. make all robots go back to base after some number of timesteps.
 wait for the same amount of timesteps for them to return.
 and yes this is yet another parameter that should be an independent variable.
 (some configurations will be finished sooner that others).
+--------> no i won't, that' robotics and not complex systems speaking (and i am desperate) 
 
 7. forbid robots from leaving the grid. if they don't get stuck at the limits
 i really don't give a shit how it's implemented at this point.
+-----> just change their velocity to be toward the delivery station
 
 8. FIX WHICH STATES USE WHICH FORCES
+-----> all of them because there are just 2 forces 
 
 
 ##############################################
@@ -83,6 +91,7 @@ there is almost 100%
 6. write the multiprocessing code.
 if you did 5 correctly, the distribution problem will be
 reduced to selecting the right array slice (i.e. it won't exist)
+----> copy old mp code
 
 
 
@@ -92,12 +101,15 @@ reduced to selecting the right array slice (i.e. it won't exist)
 
 the metrics are
 a) number of items collected - already a returned
-b) number of robots successfully returned to base - near trivial implementation 
----> after some timestep just put all of them in state return_to_base.
-conveniently, they drop items from that state already
+#####b) number of robots successfully returned to base - near trivial implementation 
+#####---> after some timestep just put all of them in state return_to_base.
+######conveniently, they drop items from that state already
+-----------> haha no
 c) percentage of covered area (without the obstacles obviously) - infer this from data 
-d) n of times the robots collided with other robots and/or obstacles - infer this from data,
-i don't feel like coding it up rn. or just skip this metric for now (let's be real here).
+####d) n of times the robots collided with other robots and/or obstacles - infer this from data,
+######i don't feel like coding it up rn. or just skip this metric for now (let's be real here).
+-----------> haha no
 
 find ways to plot this so that the graphs are fun
 -----> do that as a group and just generate the data for now
+---------> do fuckin histogram comparisons

@@ -16,7 +16,8 @@ def calcTorqueRob(pos, robRobNeig, v_hat, nOfRobots, particle_radius):
             rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobotsInNeigh,1))
             r_rob_hat  = r_rob / rnorms_rob
             dots_rob = np.sum(v_hat[i] * r_rob_hat, axis=1).reshape((nOfRobotsInNeigh,1))
-            coefs = dots_rob / (rnorms_rob - 2*particle_radius)**2
+            # 1.5 just in case they collide
+            coefs = dots_rob / (rnorms_rob - 1.5*particle_radius)**2
             # NOTE maybe this should be without the square!
             # TODO try both!
             # NOTE: calcRobField in animateField.py is built on this,
@@ -161,7 +162,7 @@ def calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, explorers, obstacleRadius, nOf
         # NOTE: calcObsField in animateField.py is built on this,
         # if you change here you gotta change there as well
         # if you want consistent fields
-        coefs_obs = dots_obs / (rnorms_obs - obstacleRadius - particle_radius)**2 
+        coefs_obs = dots_obs / (rnorms_obs - obstacleRadius - 0.5*particle_radius)**2 
         # try repelling them now
         # crosses v_i with r_i and does so for all i
         crosses_obs = np.cross(v_hat[i], r_obs_hat).reshape((nOfObssInNeigh, 1))
@@ -195,7 +196,7 @@ def calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius):
         # if you change here you gotta change there as well
         # if you want consistent fields
         # TRYITNO
-            rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p] - 2*particle_radius)**2 for p in range(nOfRobotsInNeigh)])
+            rob_forces = np.array([r_rob_hat[p] / (rnorms_rob[p] - 1.5*particle_radius)**2 for p in range(nOfRobotsInNeigh)])
             force =  np.sum(rob_forces,axis=0) 
             # it works because it's per element
             # TODO rewrite this last thing in vector form for the speeeed
@@ -267,7 +268,7 @@ def calcForceObsClusters(v, pos, robObsNeig, obstacleClusters, nOfRobots, partic
     for i in range(nOfRobots):
         nOfObssInNeigh = len(robObsNeig[i])
         if nOfObssInNeigh == 0:
-            force_obs[i] = np.zeros(2)
+            continue
         else:
             # go through each cluster
             # and blacklist checked obstacles as you go along
@@ -289,7 +290,7 @@ def calcForceObsClusters(v, pos, robObsNeig, obstacleClusters, nOfRobots, partic
                 r_obs = pos[i] - clusterAsList
                 rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nInCluster,1))
                 r_obs_hat  = r_obs / rnorms_obs
-                cluster_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius - particle_radius)**2 for p in range(nInCluster)])
+                cluster_forces = np.array([r_obs_hat[p] / (rnorms_obs[p] - obstacleRadius )**2 for p in range(nInCluster)])
                 # now combine that into a single vector
                 cluster_force = np.sum(cluster_forces, axis=0)
                 force_strength = np.linalg.norm(cluster_force)
@@ -303,12 +304,12 @@ def calcForceObsClusters(v, pos, robObsNeig, obstacleClusters, nOfRobots, partic
                 force = cluster_force_coef * cluster_force_hat
 
                 # try with this first
-                clusterForce.append(force if  cluster_force_coef < v else v * cluster_force_hat)
+                clusterForce.append(force if cluster_force_coef < v else v * cluster_force_hat)
                 
             final = np.sum(np.array(clusterForce), axis=0)
             # try this laterr
             final_norm = np.linalg.norm(final)
-            force_obs[i] = final if final_norm < v else v * final / final_norm
+            force_obs[i] = final if final_norm < 0.9*v else v*0.9 * final / final_norm
             force_obs[i] = final
 #            r_obs = pos[i] - np.array(list(map(list, robObsNeig[i])))
 #            rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObssInNeigh,1))
@@ -325,5 +326,6 @@ def calcForceObsClusters(v, pos, robObsNeig, obstacleClusters, nOfRobots, partic
 #            force_strength = np.linalg.norm(force)
 #            force_obs[i] = force if  force_strength< v else v * force / force_strength
 
+#    print(force_obs)
     return force_obs
 

@@ -31,6 +31,7 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 
 
     for step in range(N):
+        # TODO make 'em all go home after N/2
 
         ####################################################################################
         # calculate movemenent stuff
@@ -167,6 +168,19 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 
             swimmersBrownianStyle(fi, v_hat, unstuckers, deviation)
 
+        #### override whatever if they are going away from the boundary
+        overstepers = mapBoundaryEnforcing(pos, gridSize, delivery_station, nOfRobots)
+        for robo in overstepers:
+            v_hat[robo] = overstepers[robo]
+        if walkType == 'activeSwimming' or 'brownianMotion':
+            for robo in overstepers:
+                fi[robo] = 2*np.pi * np.random.random()
+
+        if walkType == 'levyFlight':
+            for robo in overstepers:
+                randAngle = 2*np.pi * np.random.random()
+                levySwimmers[robo][0] = np.array([np.cos(randAngle), np.sin(randAngle)])
+
 
 
         ####################################################################################
@@ -175,18 +189,17 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 
         # TODO check signs, strengths and other stuff
         force_rob = FR0 * calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius)
-        torque_rob = TR0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
+        #torque_rob = TR0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
 
         #force_item = FI0 * calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius)
 
         #force_obs = FO0 * calcForceObs(v, pos, robObsNeig,  nOfRobots, particle_radius, obstacleRadius)
-        force_obs = FO0 * calcForceObsClusters(v, pos, robObsNeig, obstacleClusters, nOfRobots, particle_radius, obstacleRadius)
-        print(force_obs)
+        force_obs = FO0 * calcForceObs(v, pos, robObsNeig, nOfRobots, particle_radius, obstacleRadius)
 
         # TODO put the coefficients in the force fuctions
         # and make them < v! (otherwise they will "discontinuously" jump)
 
-        torque_obs = TO0 * calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, explorers, obstacleRadius, nOfRobots, particle_radius)
+#        torque_obs = TO0 * calcTorqueObs_as_v(v, pos, robObsNeig, v_hat, explorers, obstacleRadius, nOfRobots, particle_radius)
 
         # TODO TODO TODO CHECK WHETHER THIS MAKES SENSE
         #fi = fi - torque_obs
@@ -198,19 +211,19 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 # TODO make should be chosen by some nice ifs because you will be tweaking it a lot
         x[:, step+1] = x[:,step] +  v * v_hat[:,0]
         x[:, step+1] = x[:, step+1] + force_rob[:,0] 
-        x[:, step+1] = x[:, step+1] + torque_rob[:,0] 
+        #x[:, step+1] = x[:, step+1] + torque_rob[:,0] 
         #x[:, step+1] = x[:, step+1] - force_item[:,0] 
         x[:, step+1] = x[:, step+1] + force_obs[:,0] 
-        x[:, step+1] = x[:, step+1] + torque_obs[:,0] 
-        x[:, step+1] = x[:, step+1] % gridSize
+#        x[:, step+1] = x[:, step+1] + torque_obs[:,0] 
+        x[:, step+1] = x[:, step+1] #% gridSize
 
         y[:, step+1] = y[:,step] +  v * v_hat[:,1] 
         y[:, step+1] = y[:,step+1] + force_rob[:,1] 
-        y[:, step+1] = y[:, step+1] + torque_rob[:,1] 
+        #y[:, step+1] = y[:, step+1] + torque_rob[:,1] 
         #y[:, step+1] = y[:,step+1] - force_item[:,1] 
         y[:, step+1] = y[:,step+1] + force_obs[:,1] 
-        y[:, step+1] = y[:,step+1] + torque_obs[:,1] 
-        y[:, step+1] = y[:,step+1] % gridSize
+#        y[:, step+1] = y[:,step+1] + torque_obs[:,1] 
+        y[:, step+1] = y[:,step+1] #% gridSize
 
         
         # we only need to exclude robots

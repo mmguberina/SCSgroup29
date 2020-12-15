@@ -1,165 +1,269 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import norm
-from celluloid import Camera
 import matplotlib
+from scipy.stats import norm
+from getForcesFromNeighbourhoods import *
+from celluloid import Camera
+from animate import *
+from environments import *
+from realismFunctions import *
+from getVelocitiesFromStates import *
+
+def swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
+                   v, particle_radius, torque_radius, obstacles,obstacleRadius,obstacleClusters,         # environment robot physical params 
+                   walkType, ni, trans_dif_T, rot_dif_T, deviation,                                         # random walk params
+                   T0, FR0, FI0, FO0,                                                   # artificial potential field parameters 
+                   nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance       # unstucking parameters
+                   ):
 
 
-def activeSwimmers(x, y, fi, n, dt, T0, nOfParticles, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius, out=None):
+    nOfCollectedItemsPerTime = [[0,0]]
+    item_positions_list = np.array(list(item_positions_set))
+    item_positions_listPerTime = [[0, item_positions_list]]
+    nOfItems = len(item_positions_set)
+    #fi = np.random.random(nOfRobots) * 2*np.pi
+    fi = np.array([np.pi / 2])
 
-#    fi[:,0] = np.array([-np.pi/2, np.pi/2])
-    fi[:,0] = np.array([0, 0, np.pi/2])
+    # 0 is search, 1 is delivering, 2 is going to pick up a spotted item, 3 if they are unstucking themselves
+    # 4 is levy flight (for us that's going in one direction for some amount of time)
+    robot_states = np.zeros(nOfRobots)
+    robot_storage = {rob:[] for rob in range(nOfRobots)}
 
-    for step in range(n):
-        pos = np.hstack((x[:, step].reshape((nOfParticles,1)), 
-                         y[:, step].reshape((nOfParticles,1))))
+    levySwimmers = {}
+    for step in range(N):
+
+        ####################################################################################
+        # calculate movemenent stuff
+        ####################################################################################
+
+        pos = np.hstack((x[:, step].reshape((nOfRobots,1)), 
+                         y[:, step].reshape((nOfRobots,1))))
         # also get the speeds for each particle
         # this already is vhat 'cos sin^2(x) + cos^2(x) = 1
-        v_hat = np.hstack((np.cos(fi[:, step]).reshape((nOfParticles,1)), 
-                            np.sin(fi[:, step]).reshape((nOfParticles,1))))
+#        v_hat = np.hstack((np.cos(fi) .reshape((nOfRobots,1)), 
+#                            np.sin(fi).reshape((nOfRobots,1))))
 
-        torque = np.zeros((nOfParticles,1))
-        for i in range(nOfParticles):
-            # calculate direction vector to every vector ( r_i,i is not a thing tho)
-            r = pos[i] - pos 
-#            r = pos - pos[i]
-            # calculate the norm of every direction vector
-            rnorms = np.linalg.norm(r, axis=1).reshape((nOfParticles,1))
-            # we need rhat
-            r_hat  = r / rnorms
-            r_hat[i] = np.zeros(2)
-            # dot 'em. dot does not support axis thing so we do it like this 
-            dots = np.sum(v_hat[i] * r_hat, axis=1).reshape((nOfParticles,1))
-            coefs = dots / rnorms**2 # check whether the shapes are ok here, it works if they are
-            coefs[i] = 0
-            # crosses v_i with r_i and does so for all i
-            crosses = np.cross(v_hat[i], r_hat).reshape((nOfParticles, 1))
-            particle_torques = coefs * crosses
-#            print(i, particle_torques)
+        # get nbhds
+        robRobNeig, robItemNeig, robObsNeig = getNeighbourhoodsForTesting(pos, item_positions_list, 
+                nOfRobots, nOfItems, particle_radius, torque_radius, obstacles, obstacleRadius)
 
-            if rnorms[i] > torque_radius:
-                particle_torques[i] = 0
 
-            torque[i] = np.sum(particle_torques) 
+
+        ####################################################################################
+        # deal with items and states
+        ####################################################################################
+        # fill this accordingly
+        v_hat = np.zeros((nOfRobots, 2))
+        # TODO you are (correctly) calculating torques only when you're in 0 state!!!!!!!!!!!!!
+        # this needs to be done so that torque calculating functions 
+        # output appropriate x and y changes like everything else!
+        # or have different functions depending on the state!!
+        # TODO that is totally wrong!!!!!!!
+
+        # handle all states here
+        # do all calculations in separate functions
+        explorers, returners, itemPickers = separateByState(robot_states, nOfRobots)
+
+
+        # state 0 - active swimming (this is overwritten if it's some other state)
+        # or handle state 4 - levy flight (going for some time in one direction)
+        if walkType == 'activeSwimming':
+            activeSwimmersStyleRW(fi, ni, v_hat, explorers)
+
+# TODO they need to be able to switch from state 4 which they don't do right now
+        if walkType == 'levyFlight':
+            # handle state 3 - unstucking
+            newLevySwimmers = generateLevyFlightSteps(v, explorers, gridSize)
+            levySwimmers.update(newLevySwimmers)
+            for robo in newLevySwimmers:
+                robot_states[robo] = 4
+
+            doneWithLevySwimming = set()
+            for robo in levySwimmers:
+                levySwimmers[robo][-1] -= 1
+                if levySwimmers[robo][-1] == 0:
+                    robot_states[robo] = 0
+                    # can't remove dict item when iterating over the dict
+                    #unstuckers.pop(robo)
+                    doneWithLevySwimming.add(robo)
+            for robo in doneWithLevySwimming:
+                levySwimmers.pop(robo)
+
+            levySwim(levySwimmers, v_hat)
+
+
+        if walkType == 'brownianMotion':
+            swimmersBrownianStyle(fi, v_hat, explorers, deviation)
+
+
+        # handle state 1 - delivering to station
+        v_hats2DelSt = v_hat2DeliveryStationFromState(pos, delivery_station, particle_radius, robot_states, returners)
+        for robo in v_hats2DelSt:
+            isDone = (v_hats2DelSt[robo] == 0).all()
+            # if done, drop off the item and go back to roaming
+            if isDone:
+                nOfCollectedItemsPerTime.append([step, nOfCollectedItemsPerTime[-1][1] + len(robot_storage[robo])])
+                robot_storage[robo].clear()
+                robot_states[robo] = 0
+            else:
+                v_hat[robo] = v_hats2DelSt[robo]
+
+
+
+        ####################################################################################
+        # superimpose forces
+        ####################################################################################
+
+        # TODO check signs, strengths and other stuff
+        force_rob = calcForceRob(v, pos, robRobNeig, nOfRobots, particle_radius)
+        force_rob = FR0 * force_rob
+        #torque_rob = FR0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
+        torque_rob = 0 * calcTorqueRob_as_v(v, pos, robRobNeig, v_hat, nOfRobots, particle_radius)
+
+        force_item = FI0 * calcForceItem(v, pos, robItemNeig, nOfRobots, particle_radius)
+
+        #force_obs = FO0 * calcForceObs(v, pos, robObsNeig,  nOfRobots, particle_radius, obstacleRadius)
+        force_obs = FO0 * calcForceObsClusters(v, pos, robObsNeig,  obstacleClusters, nOfRobots, particle_radius, obstacleRadius)
+
+        # TODO put the coefficients in the force fuctions
+        # and make them < v! (otherwise they will "discontinuously" jump)
+
+        #torque_obs = FO0  * calcForceObsClusters(v, pos, robObsNeig, obstacleClusters, nOfRobots, particle_radius, obstacleRadius)
+
+        # TODO TODO TODO CHECK WHETHER THIS MAKES SENSE
+        #fi = fi - torque_obs
+
+        ####################################################################################
+        # perform position updates 
+        ####################################################################################
+
+# TODO make should be chosen by some nice ifs because you will be tweaking it a lot
+        x[:, step+1] = x[:,step] +  v * v_hat[:,0]
+        x[:, step+1] = x[:, step+1] + force_rob[:,0] 
+        x[:, step+1] = x[:, step+1] + torque_rob[:,0] 
+        x[:, step+1] = x[:, step+1] - force_item[:,0] 
+        x[:, step+1] = x[:, step+1] + force_obs[:,0] 
+        #x[:, step+1] = x[:, step+1] + torque_obs[:,0] 
+        #x[:, step+1] = x[:, step+1] - torque_obs[:,0] 
+        x[:, step+1] = x[:, step+1] % gridSize
+
+        y[:, step+1] = y[:,step] +  v * v_hat[:,1] 
+        y[:, step+1] = y[:,step+1] + force_rob[:,1] 
+        y[:, step+1] = y[:, step+1] + torque_rob[:,1] 
+        y[:, step+1] = y[:,step+1] - force_item[:,1] 
+        y[:, step+1] = y[:,step+1] + force_obs[:,1] 
+        #y[:, step+1] = y[:,step+1] + torque_obs[:,1] 
+        #y[:, step+1] = y[:,step+1] - torque_obs[:,1] 
+        y[:, step+1] = y[:,step+1] % gridSize
+
         
-        torque = T0 * torque
-#        print(torque)
-
-        fi[:, step+1] = fi[:, step] + torque.reshape((nOfParticles,))
-        v_hat = np.hstack((np.cos(fi[:, step+1].reshape((nOfParticles,1))), 
-                            np.sin(fi[:, step+1].reshape((nOfParticles,1)))))
-        x[:, step+1] = (x[:,step] +  v * v_hat[:,0]) % gridSize
-        y[:, step+1] = (y[:,step] +  v * v_hat[:,1]) % gridSize
-
-        pos = np.hstack((x[:, step+1].reshape((nOfParticles,1)), 
-                         y[:, step+1].reshape((nOfParticles,1))))
-
-        # now you need to ensure that they do not overlap
-        # what if i push it into another particle tho???????????????????
-        #print(pos)
-        for p in range(nOfParticles):
-            r = pos[p] - pos 
-#            print(r)
-            rnorms = np.linalg.norm(r, axis=1).reshape((nOfParticles,1))
-            rnorms[p] = 'Inf'
-            r_hat  = r / rnorms
-#            print(rnorms)
-            for n in range(nOfParticles):
-                if rnorms[n] < 2 * particle_radius:
-
-                    overlap = 2 * particle_radius - rnorms[n]
-                    moveVec = r_hat[n] * (overlap / 2)
-                    x[p, step+1] += moveVec[0]
-                    y[p, step+1] += moveVec[1]
-                    x[n, step+1] -= moveVec[0]
-                    y[n, step+1] -= moveVec[1]
+        # we only need to exclude robots
+        pos = np.hstack((x[:, step+1].reshape((nOfRobots,1)), 
+                         y[:, step+1].reshape((nOfRobots,1))))
 
 
-    return x, y, fi
+        # here we'll pass by reference (but in the pytonic way)
+        # esentially this means that volume exclusion will update the x and y array
+        # which exists as the code is running, i.e. they won't be copied when entering to 
+        # the function
+        # think of this function as simply having the code put in another place, not
+        # really a function with inputs and outputs
+        volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nOfRobots, obstacleRadius)
+        # this will be used for interpretable animation
+        robot_statesPerTime[:,step] = robot_states 
+    return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
 
 
 
-
-nOfParticles = 3
+#nOfRobots = 30
+nOfRobots = 1
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
-ni = 0.002
-v = 0.05
+nis = [np.pi *2, np.pi * 0.02, np.pi * 0.002]
+ni = nis[1] 
+ni = 0
+v = 0.03
+#v = 0.3
 # Total time.
-T = 1
-gridSize = 100
-torque0 = 1
-particle_radius = 1
-torque_radius = 6 * particle_radius
+
+# TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
+obstacleRadius = 30
+gridSize = 500
+T0 = 1
+particle_radius = 3
+#torque_radius = 20 
+torque_radius = 50
+FI0 = 0.11#0.5
+FR0 = 1
+FO0 = 0.9
+deviation = 0.55
+
+nOfUnstuckingSteps = 600
+stuckThresholdTime = 200
+stuckThresholdDistance = v * 6
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 400
-# Time step size
-dt = T/N
+N = 10000
 # Initial values of x.
-# you should init this to sth other than 0
-x = np.zeros((1 * nOfParticles,N+1))
-y = np.zeros((1 * nOfParticles,N+1))
-fi = np.zeros((1 * nOfParticles,N+1))
+x = np.zeros((1 * nOfRobots,N+1))
+#x[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+x[:,0] = gridSize // 2 
+y = np.zeros((1 * nOfRobots,N+1))
+#y[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+y[:,0] = gridSize // 2 - 3*obstacleRadius
+robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 
 
-#x[0] = np.array([49.])
-#y[0] = np.array([51])
-#x[1] = np.array([51.])
-#y[1] = np.array([49])
+# 5 items
+#nOfItems = 50
+nOfItems = 0
 
-x[0] = np.array([49.])
-y[0] = np.array([52])
-x[1] = np.array([49.])
-y[1] = np.array([49])
-x[2] = np.array([52.])
-y[2] = np.array([49])
+#percetangeOfCoverage = 0.01
+percetangeOfCoverage = 0.01
+delivery_station = np.array([0,0])
 
-x, y, fi = activeSwimmers(x, y, fi, N, dt, torque0, nOfParticles, ni, v, trans_dif_T, rot_dif_T, gridSize, particle_radius, torque_radius)
+#obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
+obstacles = np.array([[gridSize // 2 - 1.5 * obstacleRadius, gridSize // 2], 
+                     [gridSize // 2 + 1.5 * obstacleRadius, gridSize // 2],
+     #                [gridSize // 2 - 3.5 * obstacleRadius, gridSize // 2],
+                     [gridSize // 2, gridSize // 2]])
+     #                [gridSize // 2 + 3.5 * obstacleRadius, gridSize // 2]])
 
-fig, ax = plt.subplots()
-ax.set_xlim(45,55)
-ax.set_ylim(45,55)
-ax.grid()
+item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
+
+#walkType = 'levyFlight'
+walkType = 'activeSwimming'
+#walkType = 'brownianMotion'
+
+obstacleClusters = indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius)
+print(obstacleClusters)
+exit()
+
+
+x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
+    swimmersInFields(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
+                   v, particle_radius, torque_radius, obstacles,obstacleRadius, obstacleClusters,        # environment robot physical params 
+                   walkType, ni, trans_dif_T, rot_dif_T, deviation,                                          # random walk params
+                   T0, FR0, FI0, FO0,                                                    # artificial potential field parameters 
+                   nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)       # unstucking parameters
+
+fig1, ax1 = plt.subplots(1)
+ax1.grid()
 # Plot the 2D trajectory.
-camera = Camera(fig)
-s = (10000)
+# the camera way
+camera = Camera(fig1)
 
-#ax.scatter(x[0, 0], y[0, 0], s=s, color='red')
-for timestep in range(N):
-   # for i in range(nOfParticles):
-#    if timestep == 100 or timestep == 1001:
-    ax.scatter(x[0, timestep], y[0, timestep], s=s, color='red')
-    ax.scatter(x[1, timestep], y[1, timestep], s=s, color='blue')
-    ax.scatter(x[2, timestep], y[2, timestep], s=s, color='green')
-#    ax.quiver(x[0, timestep], y[0, timestep], np.cos(fi[0, timestep]), np.sin(fi[0,timestep]))
-#    ax.quiver(x[1, timestep], y[1, timestep], np.cos(fi[1, timestep]), np.sin(fi[1,timestep]))
+# item_positions_list changes, you need to send a list of lists to know the changes
+animate(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_radius, ax1, camera, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
 
-#    print(x[:, timestep], y[:, timestep])
-#    for p in range(nOfParticles):
 
-#        for p in range(nOfParticles):
-            #ax.plot(x[p, -10:], y[p, -10:], color='blue')
-#ax.plot(x[2, :], y[2, :], color='blue')
-    camera.snap()
-
-#plt.show()
-# Mark the start and end points.
-#ax.plot(x[0,0],x[1,0], 'go')
-#ax.plot(x[0,-1], x[1,-1], 'ro')
-#
-## More plot decorations.
-#ax.set_title('2D Brownian Motion')
-#ax.set_xlabel('x', fontsize=16)
-#ax.set_ylabel('y', fontsize=16)
-#ax.axis('equal')
-#t = np.linspace(0,T,int(T//dt))
-#msd = MSD(x, dt, T)
-#msd = calcMSDAvg(rot_dif_T, trans_dif_T, v, T, N)
-#ax.loglog(t, msd)
 animation = camera.animate()
-animation.save('somerun.mp4')
+#animation.save('./vids/building_blocks/only_walks_and_APF_obs' + str(len(obstacles)) + '_item_' + str(nOfItems) + '_robots_' + str(nOfRobots) + '.mp4')
+animation.save('torquetest' + '.mp4')
+
+
+# TODO generate artificial field plot as well
 plt.show()

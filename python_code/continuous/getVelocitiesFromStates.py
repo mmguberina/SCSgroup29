@@ -149,6 +149,13 @@ def levySwim(levySwimmers, v_hat):
     for i in levySwimmers:
         v_hat[i] = levySwimmers[i][0]
 
+def mapBoundaryEnforcing(pos, gridSize, delivery_station, nOfRobots):
+    returners = {}
+    for i in range(nOfRobots):
+        if pos[i][0] > gridSize or pos[i][0] < 0 or pos[i][1] > gridSize or pos[i][1] < 0:
+            v_to_ds = delivery_station - pos[i]
+            returners[i] = v_to_ds / np.linalg.norm(v_to_ds)
+    return returners
 
 # now monitor this the same way you monitor unstuckers in the main loop
 # (it's mostly the same thing really)
