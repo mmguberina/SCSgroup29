@@ -73,7 +73,7 @@ def animate(x, y, robot_statesPerTime, item_positions, N, nOfRobots, particle_ra
 
             #ax.scatter(walls[:,0], walls[:,1], s=s, color='black')
                 #ax.scatter(cluster2[:, 0], cluster2[:, 1], color='blue')
-            ax.set_title("total delivered items: " + str(currently_collected))
+#            ax.set_title("total delivered items: " + str(currently_collected))
             camera.snap()
 
 

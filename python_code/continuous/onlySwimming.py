@@ -110,7 +110,7 @@ stuckThresholdDistance = v * 6
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 2000
+N = 5000
 # Initial values of x.
 x = np.zeros((1 * nOfRobots,N+1))
 #x[:,0] = np.random.random(nOfRobots) * gridSize
@@ -135,8 +135,8 @@ obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, del
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
 #walkType = 'activeSwimming'
-#walkType = 'levyFlight'
-walkType = 'brownianMotion'
+walkType = 'levyFlight'
+#walkType = 'brownianMotion'
 
 deviation = nis[1]
 

@@ -10,7 +10,7 @@ from funcAnimate import *
 import pandas as pd
 
 
-nOfRobots = 40
+nOfRobots = 10
 #rot_dif_T = 0.2
 #trans_dif_T = 0.2
 #v = 1
@@ -22,7 +22,7 @@ v = 0.3
 
 # TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
 obstacleRadius = 30
-gridSize = 1000
+gridSize = 800
 T0 = 1
 particle_radius = 5
 torque_radius = 100 
@@ -45,7 +45,7 @@ TO0 = 0.0
 
 
 #FO0 = 1.0
-deviation = 0.055
+deviation = 0.15
 
 nOfUnstuckingSteps = 600
 stuckThresholdTime = 300
@@ -54,7 +54,7 @@ stuckThresholdDistance = v * 300
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 6000
+N = 8000
 #N = 5000
 # Initial values of x.
 x = np.zeros((1 * nOfRobots,N+1))
@@ -71,9 +71,9 @@ robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 
 # 5 items
 #nOfItems = 10
-nOfItems = 1
+nOfItems = 25
 
-percetangeOfCoverage = 0.03
+percetangeOfCoverage = 0.01
 delivery_station = np.array([gridSize // 2, gridSize // 2])
 
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
@@ -82,8 +82,8 @@ obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, del
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
 #walkType = 'levyFlight'
-#walkType = 'activeSwimming'
-walkType = 'brownianMotion'
+walkType = 'activeSwimming'
+#walkType = 'brownianMotion'
 
 
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
@@ -114,7 +114,7 @@ animate(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_r
 
 
 animation = camera.animate()
-animation.save('robot_roam=' +str(ni)  +'.mp4')
+animation.save('new_anim' + '.mp4')
 
 # funcanim way
 #nOfSkippedFrames = 1
