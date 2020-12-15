@@ -44,9 +44,9 @@ def do5Tests(jobQueue):
                         nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)
 
 
-            dataframe_x = pd.DataFrame({'x':x, 'y':y, 'robstate':robot_statesPerTime})
-            dataframe_y = pd.DataFrame({'x':x, 'y':y, 'robstate':robot_statesPerTime})
-            dataframe_rs = pd.DataFrame({'x':x, 'y':y, 'robstate':robot_statesPerTime})
+            dataframe_x = pd.DataFrame({'x':x})
+            dataframe_y = pd.DataFrame({'y':y})
+            dataframe_rs = pd.DataFrame({'robstate':robot_statesPerTime})
 
             dataFileName = "./data/" + str(nOfRobots) + "_" + str(walkType) + str(ni) + "_" \
                             + str(deviation) + "_" + str(percetangeOfCoverage) \
