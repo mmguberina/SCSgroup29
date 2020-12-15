@@ -12,19 +12,26 @@ def getNeighbourhoods(pos, item_positions_list, nOfRobots, nOfItems, particle_ra
     for i in range(nOfRobots):
         # calculate direction vector to every vector ( r_i,i is not a thing tho)
         r_rob = pos[i] - pos 
-        r_item = pos[i] - item_positions_list
-        r_obs  = pos[i] - obstacles
         # calculate the norm of every direction vector
         rnorms_rob = np.linalg.norm(r_rob, axis=1).reshape((nOfRobots,1))
-        rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
-        rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObss,1))
 
         # form neighbourhoods 
         robRobNeig[i] = {rob for rob in range(nOfRobots) 
                 if rnorms_rob[rob] < torque_radius and rob != i}
-        robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < torque_radius}
-        robObsNeig[i] = {tuple(obstacles[o]) for o in range(nOfObss) 
-                if rnorms_obs[o] - obstacleRadius < torque_radius}
+
+    if nOfItems > 0:
+        for i in range(nOfRobots):
+            r_item = pos[i] - item_positions_list
+            rnorms_item = np.linalg.norm(r_item, axis=1).reshape((nOfItems,1))
+            robItemNeig[i] = {tuple(item_positions_list[it]) for it in range(nOfItems) if rnorms_item[it] < torque_radius}
+
+    if nOfObss > 0:
+        for i in range(nOfRobots):
+            r_obs  = pos[i] - obstacles
+            rnorms_obs = np.linalg.norm(r_obs, axis=1).reshape((nOfObss,1))
+            robObsNeig[i] = {tuple(obstacles[o]) for o in range(nOfObss) 
+                    if rnorms_obs[o] - obstacleRadius < torque_radius}
+
     return robRobNeig, robItemNeig, robObsNeig
 
 

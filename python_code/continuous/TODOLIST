@@ -7,6 +7,8 @@ at some later point
 # fields things
 ##############################################
 
+DONE WITH THIS WHATEVER IT IS
+
 
 1. do the the artificial field plots which clearly show how they work
 	--> 1 robot, 2 obstacles type of plot for that purpose
@@ -47,6 +49,8 @@ overlap:
 ##############################################
 # testing  prep
 ##############################################
+# DONE WITH THIS
+
 4. (finally) code the sample environments (jeez)
 ------> yeah i'm not fucking doing that. let them be sparse,
 normal and cluttered because i have that already.

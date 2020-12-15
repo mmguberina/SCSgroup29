@@ -6,17 +6,18 @@ from realismFunctions import *
 from getVelocitiesFromStates import *
 
 def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
-                   v, particle_radius, torque_radius, obstacles,obstacleRadius,obstacleClusters,         # environment robot physical params 
-                   walkType, ni, trans_dif_T, rot_dif_T, deviation,                                         # random walk params
+                   v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
+                   walkType, ni, deviation,                                         # random walk params
                    T0, FR0, FI0, FO0, TR0, TO0,                                                   # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance       # unstucking parameters
                    ):
-
 
     nOfCollectedItemsPerTime = [[0,0]]
     item_positions_list = np.array(list(item_positions_set))
     item_positions_listPerTime = [[0, item_positions_list]]
     nOfItems = len(item_positions_set)
+    nOfStartingItems = nOfItems
+    nOfDeliveredItems = 0
     fi = np.random.random(nOfRobots) * 2*np.pi
 
     # 0 is search, 1 is delivering, 2 is going to pick up a spotted item, 3 if they are unstucking themselves
@@ -133,15 +134,14 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
                 robot_storage[robo].append(robsWithNearItems[robo])
                 item_positions_set.remove(robsWithNearItems[robo])
                 nOfItems -= 1
-                if nOfItems == 0:
-                    # TODO# TODO# TODO
-                    # TODO simulation should end when they all return to base 
-                    # after some max final step which denotes end of battery life
-                    # TODO# TODO# TODO
-                    return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
 
                 # put it in going back mode
                 robot_states[robo] = 1
+                nOfDeliveredItems += 1
+
+                if nOfDeliveredItems == nOfStartingItems:
+                    print("done")
+                    return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
 
                 item_positions_list = np.array(list(item_positions_set))
                 item_positions_listPerTime.append([step, item_positions_list])

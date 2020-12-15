@@ -83,6 +83,9 @@ def initializeItems(nOfItems, gridSize, obstacles, obstacleRadius):
     item_positions_set = set(map(tuple, item_positions_list))
 
     #remove em
+    if len(obstaclesSet) == 0:
+        return item_positions_set, item_positions_list
+
     for i in range(nOfItems):
         r_obs = obstacles - item_positions_list[i]
         rnorms = np.linalg.norm(r_obs, axis=1)
