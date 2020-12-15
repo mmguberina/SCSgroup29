@@ -178,8 +178,9 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 
         if walkType == 'levyFlight':
             for robo in overstepers:
-                randAngle = 2*np.pi * np.random.random()
-                levySwimmers[robo][0] = np.array([np.cos(randAngle), np.sin(randAngle)])
+                if robo in levySwimmers:
+                    randAngle = 2*np.pi * np.random.random()
+                    levySwimmers[robo][0] = np.array([np.cos(randAngle), np.sin(randAngle)])
 
 
 

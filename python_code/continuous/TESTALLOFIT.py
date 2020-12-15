@@ -27,9 +27,9 @@ def do5Tests(jobQueue):
             print("doing the", i+1, "test for given params")
 
             x = np.zeros((1 * nOfRobots,N+1))
-            x[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+            x[:,0] = 20 * np.random.random(nOfRobots) - 1 + gridSize // 2
             y = np.zeros((1 * nOfRobots,N+1))
-            y[:,0] = 2 * np.random.random(nOfRobots) - 1 + gridSize // 2
+            y[:,0] = 20 * np.random.random(nOfRobots) - 1 + gridSize // 2
             robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
             delivery_station = np.array([gridSize // 2, gridSize // 2])
             obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
@@ -55,7 +55,7 @@ def do5Tests(jobQueue):
 
             x.tofile(fid_x)
             y.tofile(fid_y)
-            rs.tofile(fid_rs)
+            robot_statesPerTime.tofile(fid_rs)
 
             fid_x.close()
             fid_y.close()
@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     nOfProcesses = 4
     jobQueue = mp.Queue()
-    jobs = jobs[0:50]
+    jobs = jobs[133:136]
     for job in jobs:
         jobQueue.put(job)
 
