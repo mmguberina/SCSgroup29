@@ -134,9 +134,9 @@ obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, del
 
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
-walkType = 'activeSwimming'
+#walkType = 'activeSwimming'
 #walkType = 'levyFlight'
-#walkType = 'brownianMotion'
+walkType = 'brownianMotion'
 
 deviation = nis[1]
 
@@ -169,4 +169,5 @@ fig2, ax2 = plt.subplots(1)
 for i in range(nOfRobots):
     ax2.set_title("walking type: " + walkType)
     ax2.plot(x[i], y[i])
+plt.savefig("./prez_img/" + walkType + ".png")
 plt.show()
