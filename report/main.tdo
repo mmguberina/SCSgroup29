@@ -1,0 +1,7 @@
+\contentsline {todo}{TODO: Find references}{1}{}
+\contentsline {todo}{TODO: Paragraphs briefly explaining brownian motion, active brownian motion and Levy flights. Not very math-y, yet; we'll go into the proper theory in Methods. Just ``Brownian motion is a kind of random motion, used to model the random motion of particles, and was developed by Einstein back in the day'' etc.}{1}{}
+\contentsline {todo}{TODO: Make sure we actually switch between walks!}{1}{}
+\contentsline {todo}{Write anything more about the geometry?}{1}{}
+\contentsline {todo}{TODO: can we call brownian motion and active brownian motion different types of walks? We can, right?}{1}{}
+\contentsline {todo}{\cite {basu2018active} talks a bit about how Active brownian motion is similar to brownian motion on a very long timescale, but initially it is very different. Maybe that's worth mentioning? (See section II. Model)}{1}{}
+\contentsline {todo}{Feels kinda stupid to note that we want to avoid collisions, but on the other hand I feel like stuff like that is nice to mention?}{1}{}

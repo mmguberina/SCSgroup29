@@ -1,0 +1,738 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.19)  5 JAN 2021 20:05
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**main.tex
+(./main.tex
+LaTeX2e <2020-02-02> patch level 5
+L3 programming layer <2020-09-06>
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/revtex/revtex4-2.cls
+Document Class: revtex4-2 2019/01/18/14:29:48 4.2c (https://journals.aps.org/re
+vtex/ for documentation)
+ Copyright (c) 2019 American Physical Society.
+ mailto:revtex@aps.org
+ Licensed under the LPPL:
+http://www.ctan.org/tex-archive/macros/latex/base/lppl.txt
+ Arthur Ogawa <arthur_ogawa at sbcglobal dot net>
+ Based on work by David Carlisle <david at dcarlisle.demon.co.uk>Version (4.2c)
+: Modified by Mark Doyle
+ .
+ltxutil[2019/01/18/14:29:48 4.2c utilities package (portions licensed from W. E
+. Baxter web at superscript.com)]
+LaTeX Info: Redefining \@centercr on input line 315.
+Class revtex4-2 Info: Repairing broken LaTeX eqnarray on input line 365.
+\eqncolsep=\skip47
+Class revtex4-2 Info: Repairing hyperref-unfriendly LaTeX definition of \mpfoot
+note on input line 440.
+Class revtex4-2 Info: Repairing broken LateX \@sect on input line 762.
+\intertabularlinepenalty=\count168
+\@tbpen=\count169
+\@arstrutbox@hline=\box45
+Class revtex4-2 Info: Repairing broken LaTeX \@xbitor on input line 1793.
+Class revtex4-2 Info: Making \typeout \long on input line 2053.
+ltxfront[2019/01/18/14:29:48 4.2c frontmatter package (AO,DPC,MD)]
+\c@affil=\count170
+\c@collab=\count171
+\absbox=\box46
+ltxgrid[2019/01/18/14:29:48 4.2c page grid package (portions licensed from W. E
+. Baxter web at superscript.com)]
+\c@linecount=\count172
+\output@latex=\toks15
+\box@size@1=\box47
+\box@size@2=\box48
+\@protection@box=\box49
+\@topmark@saved=\toks16
+\footins@saved=\box50
+\footins@recovered=\box51
+\column@recovered=\box52
+\pagesofar=\box53
+\footsofar=\box54
+\pagegrid@col=\count173
+
+Class revtex4-2 Warning: Failed to recognize \@vspace, \@vspacer, \@no@pgbk, \@
+newline, and \\; no patches applied. Please get a more up-to-date class, .
+
+\c@part=\count174
+\c@section=\count175
+\c@subsection=\count176
+\c@subsubsection=\count177
+\c@paragraph=\count178
+\c@subparagraph=\count179
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\c@figure=\count180
+\fbox@1=\box55
+\c@table=\count181
+\fbox@2=\box56
+\c@video=\count182
+\fbox@4=\box57
+\@bibdataout=\write3
+\widetext@top=\box58
+\widetext@bot=\box59
+Class revtex4-2 Info: Selecting society aps on input line 7581.
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/revtex/aps4-2.rtx
+File: aps4-2 2019/01/18/14:29:48 4.2c (https://journals.aps.org/revtex/ for doc
+umentation)
+Class revtex4-2 Info: RevTeX society APS selected on input line 37.
+)
+
+Class revtex4-2 Warning: No journal specified, using default pra.
+
+Class revtex4-2 Info: APS journal PRA selected on input line 7584.
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/revtex/aps10pt4-2.rtx
+File: aps10pt4-2 2019/01/18/14:29:48 4.2c (https://journals.aps.org/revtex/ for
+ documentation)
+Class revtex4-2 Info: RevTeX pointsize 10pt selected on input line 36.
+) (/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/textcase/textcase.st
+y
+Package: textcase 2019/09/14 v1.00 Text only upper/lower case changing (DPC)
+) (/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\@emptytoks=\toks17
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)) (/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2020/01/20 v2.17e AMS math features
+\@mathmargin=\skip50
+
+For additional information on amsmath, use the `?' option.
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks18
+\ex@=\dimen134
+)
+LaTeX Info: Redefining \text on input line 28.
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen135
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count183
+LaTeX Info: Redefining \frac on input line 227.
+\uproot@=\count184
+\leftroot@=\count185
+LaTeX Info: Redefining \overline on input line 389.
+\classnum@=\count186
+\DOTSCASE@=\count187
+LaTeX Info: Redefining \ldots on input line 486.
+LaTeX Info: Redefining \dots on input line 489.
+LaTeX Info: Redefining \cdots on input line 610.
+\Mathstrutbox@=\box60
+\strutbox@=\box61
+\big@size=\dimen136
+LaTeX Font Info:    Redeclaring font encoding OML on input line 733.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 734.
+\macc@depth=\count188
+\c@MaxMatrixCols=\count189
+\dotsspace@=\muskip16
+\c@parentequation=\count190
+\dspbrk@lvl=\count191
+\tag@help=\toks19
+\row@=\count192
+\column@=\count193
+\maxfields@=\count194
+\andhelp@=\toks20
+\eqnshift@=\dimen137
+\alignsep@=\dimen138
+\tagshift@=\dimen139
+\tagwidth@=\dimen140
+\totwidth@=\dimen141
+\lineht@=\dimen142
+\@envbody=\toks21
+\multlinegap=\skip51
+\multlinetaggap=\skip52
+\mathdisplay@stack=\toks22
+LaTeX Info: Redefining \[ on input line 2859.
+LaTeX Info: Redefining \] on input line 2860.
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip53
+\bibsep=\skip54
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count195
+)
+Class revtex4-2 Info: Repairing natbib's \BibitemShut on input line 7588.
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/revtex/revsymb4-2.sty
+Package: revsymb4-2 2019/01/18/14:29:48 4.2c (https://journals.aps.org/revtex/ 
+for documentation)
+LaTeX Info: Redefining \frak on input line 101.
+LaTeX Info: Redefining \Bbb on input line 117.
+LaTeX Info: Redefining \REV@mathfrak on input line 125.
+))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2019/11/30 v1.2a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks23
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2019/11/30 v1.4a Standard LaTeX Graphics (DPC,SPQR)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/graphics-cfg/graphics.
+cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 105.
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/graphics-def/pdftex.de
+f
+File: pdftex.def 2020/08/26 v1.2 Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen143
+\Gin@req@width=\dimen144
+) (/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/tools/dcolumn.sty
+Package: dcolumn 2014/10/28 v1.06 decimal alignment package (DPC)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/tools/array.sty
+Package: array 2019/08/31 v2.4l Tabular extension package (FMi)
+\col@sep=\dimen145
+\ar@mcellbox=\box62
+\extrarowheight=\dimen146
+\NC@list=\toks24
+\extratabsurround=\skip55
+\backup@length=\skip56
+\ar@cellbox=\box63
+))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/tools/bm.sty
+Package: bm 2019/07/24 v1.2d Bold Symbol Support (DPC/FMi)
+\symboldoperators=\mathgroup6
+\symboldletters=\mathgroup7
+\symboldsymbols=\mathgroup8
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 141.
+LaTeX Info: Redefining \bm on input line 209.
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/todonotes/todonotes.st
+y
+Package: todonotes 2020/08/18 v1.1.3 Todonotes source and documentation.
+Package: todonotes 2018/11/22
+ (/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+Package: xkeyval 2014/12/03 v2.7a package option processing (HA)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+\XKV@toks=\toks25
+\XKV@tempa@toks=\toks26
+)
+\XKV@depth=\count196
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+)) (/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/frontendlayer/tikz
+.sty
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/utilities/pgfrcs.s
+ty
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/utilities/pgfuti
+l-common.tex
+\pgfutil@everybye=\toks27
+\pgfutil@tempdima=\dimen147
+\pgfutil@tempdimb=\dimen148
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/utilities/pgfuti
+l-common-lists.tex))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/utilities/pgfuti
+l-latex.def
+\pgfutil@abb=\box64
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/ms/everyshi.sty
+Package: everyshi 2001/05/15 v3.00 EveryShipout Package (MS)
+))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/utilities/pgfrcs
+.code.tex
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/pgf.revision.tex
+)
+Package: pgfrcs 2020/01/08 v3.1.5b (3.1.5b)
+))
+Package: pgf 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/basiclayer/pgfcore
+.sty
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/systemlayer/pgfsys
+.sty
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/systemlayer/pgfs
+ys.code.tex
+Package: pgfsys 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/utilities/pgfkey
+s.code.tex
+\pgfkeys@pathtoks=\toks28
+\pgfkeys@temptoks=\toks29
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/utilities/pgfkey
+sfiltered.code.tex
+\pgfkeys@tmptoks=\toks30
+))
+\pgf@x=\dimen149
+\pgf@y=\dimen150
+\pgf@xa=\dimen151
+\pgf@ya=\dimen152
+\pgf@xb=\dimen153
+\pgf@yb=\dimen154
+\pgf@xc=\dimen155
+\pgf@yc=\dimen156
+\pgf@xd=\dimen157
+\pgf@yd=\dimen158
+\w@pgf@writea=\write4
+\r@pgf@reada=\read2
+\c@pgf@counta=\count197
+\c@pgf@countb=\count198
+\c@pgf@countc=\count199
+\c@pgf@countd=\count266
+\t@pgf@toka=\toks31
+\t@pgf@tokb=\toks32
+\t@pgf@tokc=\toks33
+\pgf@sys@id@count=\count267
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/systemlayer/pgf.
+cfg
+File: pgf.cfg 2020/01/08 v3.1.5b (3.1.5b)
+)
+Driver file for pgf: pgfsys-pdftex.def
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/systemlayer/pgfs
+ys-pdftex.def
+File: pgfsys-pdftex.def 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/systemlayer/pgfs
+ys-common-pdf.def
+File: pgfsys-common-pdf.def 2020/01/08 v3.1.5b (3.1.5b)
+)))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/systemlayer/pgfs
+yssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgfsyssoftpath@smallbuffer@items=\count268
+\pgfsyssoftpath@bigbuffer@items=\count269
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/systemlayer/pgfs
+ysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+re.code.tex
+Package: pgfcore 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmath.cod
+e.tex
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathcalc
+.code.tex
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathutil
+.code.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathpars
+er.code.tex
+\pgfmath@dimen=\dimen159
+\pgfmath@count=\count270
+\pgfmath@box=\box65
+\pgfmath@toks=\toks34
+\pgfmath@stack@operand=\toks35
+\pgfmath@stack@operation=\toks36
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.code.tex
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.basic.code.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.trigonometric.code.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.random.code.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.comparison.code.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.base.code.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.round.code.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.misc.code.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfunc
+tions.integerarithmetics.code.tex)))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmathfloa
+t.code.tex
+\c@pgfmathroundto@lastzeros=\count271
+))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfint.code
+.tex)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+repoints.code.tex
+File: pgfcorepoints.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgf@picminx=\dimen160
+\pgf@picmaxx=\dimen161
+\pgf@picminy=\dimen162
+\pgf@picmaxy=\dimen163
+\pgf@pathminx=\dimen164
+\pgf@pathmaxx=\dimen165
+\pgf@pathminy=\dimen166
+\pgf@pathmaxy=\dimen167
+\pgf@xx=\dimen168
+\pgf@xy=\dimen169
+\pgf@yx=\dimen170
+\pgf@yy=\dimen171
+\pgf@zx=\dimen172
+\pgf@zy=\dimen173
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+repathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgf@path@lastx=\dimen174
+\pgf@path@lasty=\dimen175
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+repathusage.code.tex
+File: pgfcorepathusage.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgf@shorten@end@additional=\dimen176
+\pgf@shorten@start@additional=\dimen177
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+rescopes.code.tex
+File: pgfcorescopes.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgfpic=\box66
+\pgf@hbox=\box67
+\pgf@layerbox@main=\box68
+\pgf@picture@serial@count=\count272
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+regraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgflinewidth=\dimen178
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+retransformations.code.tex
+File: pgfcoretransformations.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgf@pt@x=\dimen179
+\pgf@pt@y=\dimen180
+\pgf@pt@temp=\dimen181
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+requick.code.tex
+File: pgfcorequick.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+reobjects.code.tex
+File: pgfcoreobjects.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+repathprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+rearrows.code.tex
+File: pgfcorearrows.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgfarrowsep=\dimen182
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+reshade.code.tex
+File: pgfcoreshade.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgf@max=\dimen183
+\pgf@sys@shading@range@num=\count273
+\pgf@shadingcount=\count274
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+reimage.code.tex
+File: pgfcoreimage.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+reexternal.code.tex
+File: pgfcoreexternal.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgfexternal@startupbox=\box69
+))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+relayers.code.tex
+File: pgfcorelayers.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+retransparency.code.tex
+File: pgfcoretransparency.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+repatterns.code.tex
+File: pgfcorepatterns.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/basiclayer/pgfco
+rerdf.code.tex
+File: pgfcorerdf.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/modules/pgfmodul
+eshapes.code.tex
+File: pgfmoduleshapes.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgfnodeparttextbox=\box70
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/modules/pgfmodul
+eplot.code.tex
+File: pgfmoduleplot.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/compatibility/pgfc
+omp-version-0-65.sty
+Package: pgfcomp-version-0-65 2020/01/08 v3.1.5b (3.1.5b)
+\pgf@nodesepstart=\dimen184
+\pgf@nodesepend=\dimen185
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/compatibility/pgfc
+omp-version-1-18.sty
+Package: pgfcomp-version-1-18 2020/01/08 v3.1.5b (3.1.5b)
+))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/utilities/pgffor.s
+ty
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/utilities/pgfkeys.
+sty
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/utilities/pgfkey
+s.code.tex))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmath.cod
+e.tex))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/utilities/pgffor
+.code.tex
+Package: pgffor 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/math/pgfmath.cod
+e.tex)
+\pgffor@iter=\dimen186
+\pgffor@skip=\dimen187
+\pgffor@stack=\toks37
+\pgffor@toks=\toks38
+))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/frontendlayer/ti
+kz/tikz.code.tex
+Package: tikz 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/libraries/pgflib
+raryplothandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgf@plot@mark@count=\count275
+\pgfplotmarksize=\dimen188
+)
+\tikz@lastx=\dimen189
+\tikz@lasty=\dimen190
+\tikz@lastxsaved=\dimen191
+\tikz@lastysaved=\dimen192
+\tikz@lastmovetox=\dimen193
+\tikz@lastmovetoy=\dimen194
+\tikzleveldistance=\dimen195
+\tikzsiblingdistance=\dimen196
+\tikz@figbox=\box71
+\tikz@figbox@bg=\box72
+\tikz@tempbox=\box73
+\tikz@tempbox@bg=\box74
+\tikztreelevel=\count276
+\tikznumberofchildren=\count277
+\tikznumberofcurrentchild=\count278
+\tikz@fig@count=\count279
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/modules/pgfmodul
+ematrix.code.tex
+File: pgfmodulematrix.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+\pgfmatrixcurrentrow=\count280
+\pgfmatrixcurrentcolumn=\count281
+\pgf@matrix@numberofcolumns=\count282
+)
+\tikz@expandcount=\count283
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/frontendlayer/ti
+kz/libraries/tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/frontendlayer/ti
+kz/libraries/tikzlibrarypositioning.code.tex
+File: tikzlibrarypositioning.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/frontendlayer/ti
+kz/libraries/tikzlibraryshadows.code.tex
+File: tikzlibraryshadows.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/frontendlayer/ti
+kz/libraries/tikzlibraryfadings.code.tex
+File: tikzlibraryfadings.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/libraries/pgflib
+raryfadings.code.tex
+File: pgflibraryfadings.code.tex 2020/01/08 v3.1.5b (3.1.5b)
+)))
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count284
+\calc@Bcount=\count285
+\calc@Adimen=\dimen197
+\calc@Bdimen=\dimen198
+\calc@Askip=\skip57
+\calc@Bskip=\skip58
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count286
+\calc@Cskip=\skip59
+)
+\c@@todonotes@numberoftodonotes=\count287
+)
+Class revtex4-2 Info: Unrecognized array package. Please update this document c
+lass! (Proceeding with fingers crossed.) on input line 29.
+Class revtex4-2 Info: cite was not loaded (OK!) on input line 29.
+Class revtex4-2 Info: mcite was not loaded (OK!) on input line 29.
+Class revtex4-2 Info: multicol was not loaded (OK!) on input line 29.
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/l3backend/l3backend-pd
+ftex.def
+File: l3backend-pdftex.def 2020-09-11 L3 backend support: PDF output (pdfTeX)
+\l__kernel_color_stack_int=\count288
+\l__pdf_internal_box=\box75
+)
+
+LaTeX Warning: Unused global option(s):
+    [jmp,jor].
+
+(./main.aux)
+\openout1 = `main.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/context/base/mkii/supp-pdf.m
+kii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count289
+\scratchdimen=\dimen199
+\scratchbox=\box76
+\nofMPsegments=\count290
+\nofMParguments=\count291
+\everyMPshowfont=\toks39
+\MPscratchCnt=\count292
+\MPscratchDim=\dimen256
+\MPnumerator=\count293
+\makeMPintoPDFobject=\count294
+\everyMPtoPDFconversion=\toks40
+)
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-
+base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/latexconfig/epstopdf-s
+ys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+)) ABD: EveryShipout initializing macros
+
+Package todonotes Warning: The length marginparwidth is less than 2cm and will 
+most likely cause issues with the appearance of inserted todonotes. The issue c
+an be solved by adding a line like \setlength {\marginparwidth }{2cm} prior to 
+loading the todonotes package. on input line 29.
+
+\openout3 = `mainNotes.bib'.
+
+(./main.tdo
+LaTeX Font Info:    Trying to load font information for U+msa on input line 1.
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 1.
+
+(/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+
+Package natbib Warning: Citation `basu2018active' on page 1 undefined on input 
+line 6.
+
+)
+\tf@tdo=\write5
+\openout5 = `main.tdo'.
+
+
+
+Class revtex4-2 Warning: If you want your keywords to appear in your output, us
+e document class option showkeys.
+
+(./sections/Introduction.tex) (./sections/Method.tex
+
+Package natbib Warning: Citation `basu2018active' on page 1 undefined on input 
+line 12.
+
+[1{/mnt/ubuntu/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.
+map}]) (./sections/Results.tex
+<figures/brownianMotion.png, id=40, 462.528pt x 346.896pt>
+) (./sections/Discussion.tex)
+No file main.bbl.
+
+Package natbib Warning: There were undefined citations.
+
+[2] (./main.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right .
+
+
+ ) 
+Here is how much of TeX's memory you used:
+ 15484 strings out of 480876
+ 296935 string characters out of 5907582
+ 534619 words of memory out of 5000000
+ 30797 multiletter control sequences out of 15000+600000
+ 543703 words of font info for 60 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 68i,7n,83p,651b,859s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/mnt/ubuntu/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/cm-super/cm-su
+per-ts1.enc}</mnt/ubuntu/usr/local/texlive/2020/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmbx10.pfb></mnt/ubuntu/usr/local/texlive/2020/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmbx12.pfb></mnt/ubuntu/usr/local/texlive/2020/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmbx9.pfb></mnt/ubuntu/usr/local/texlive/2020/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></mnt/ubuntu/usr/local/texliv
+e/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></mnt/ubuntu/usr/loca
+l/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></mnt/ubunt
+u/usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></
+mnt/ubuntu/usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmt
+t9.pfb></mnt/ubuntu/usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-sup
+er/sfrm1000.pfb>
+Output written on main.pdf (2 pages, 119607 bytes).
+PDF statistics:
+ 77 PDF objects out of 1000 (max. 8388607)
+ 45 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 114 words of extra memory for PDF output out of 10000 (max. 10000000)
+

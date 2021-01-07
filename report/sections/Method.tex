@@ -1,0 +1,35 @@
+\section{Methods}
+
+\subsection{Comparison of different random walks}
+Three types of walks: Brownian motion, active brownian motion and Levy flights.\TODO{can we call brownian motion and active brownian motion different types of walks? We can, right?} \note{\cite{basu2018active} talks a bit about how Active brownian motion is similar to brownian motion on a very long timescale, but initially it is very different. Maybe that's worth mentioning? (See section II. Model)}
+
+\subsection{Simulation}
+In order to answear our research question, we developed a 2D simulation.
+The simulation contains three types of objects: {\em agents (robots)}, {\em targets} and {\em obstacles}. 
+The agents are the only active objects; they diffuse throughout the surrounding area, searching for items. 
+The agents all have a radius within which they can see, which will be called a visibility sphere. 
+For simplicity, all sensors have the same visibility sphere radius.
+The items can represent different things: wildfires, people (during search and rescue), pollution etc. 
+The obstacles are hindrances that the agents have to move around, for example trees and streetlights. 
+
+Using an agent-based model several different types of random walks will be explored. Eventually, the agents will be given the capability to switch between different types of walks depending on their experience with the surrounding environment, for example if a robot has had little success with finding items the last couple of timesteps it switches to a walk type more effective in sparse environments.  \TODO{Make sure we actually switch between walks!}
+The hope is that this will lead to better results in random environments than using any of walk types by themselves.
+
+
+As the impact of the geometry of the objects was not under evaluation all of the objects are represented by circles. \note{Write anything more about the geometry?} 
+
+% We want the search to consist of both a random component and something which directs it towards the items, but without swarming at one item. What we ended up doing was Levy flights together with an artificial potential field.\todo{Right? } 
+
+%Define brownian motion and Levy flights, mention when they are best utilized.
+\subsection{Artificial potential field}
+There are currently no ways to ensure that the agents avoid collisions, both with each other and with obstacles. During simulation, the agents can pass through each other without problem, but in real life situations we need to avoid collisions to avoid damage. \note{Feels kinda stupid to note that we want to avoid collisions, but on the other hand I feel like stuff like that is nice to mention?}
+
+One remedy to keep them from colliding is to imbue the agents and obstacles with artificial potential fields, which repulses them from each other, with the strength of the repulsion increasing as the distance between the objects decreases. 
+% inverse proportionally? Inverse square? 
+
+
+
+
+
+\subsection{Optimizing parameters with a genetic algorithm} 
+TBD. Have the algorithm, need to figure out how to run it with the simulation. 

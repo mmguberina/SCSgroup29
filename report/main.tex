@@ -1,0 +1,82 @@
+\documentclass[%
+%sor,
+%aip,
+aps,
+draft, % doesn't print figures, among others. Compiles faster
+%final, % removes todos
+%twoside,
+%groupedaddress,
+jmp,
+ jor,
+ amsmath,amssymb,
+%preprint,%
+ reprint,%
+%author-year,%
+%author-numerical,%
+]{revtex4-2}
+
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+
+\usepackage[obeyFinal,%
+]{todonotes} 
+\newcommand{\TODO}[1]{\todo[inline]{TODO: #1}} % creates new command, \TODO. The ordinary, non-inline, version of \todo doesn't work well with the columns (especially longer todos). 
+\newcommand{\note}[1]{\todo[inline]{#1}} % creates new command, \TODO. The ordinary, non-inline, version of \todo doesn't work well with the columns (especially longer todos). 
+
+\begin{document}
+\title[Sample title]{Efficient area coverage with random search}%\footnote{Error!}}% Force line breaks with \\
+%\thanks{Very rough draft.}
+
+
+\author{Marko Guberina}
+\author{Christian Josefson}%
+
+\author{Anders Segerlund}
+\affiliation{%
+Chalmers University of Technology%\\This line break forced% with \\
+}%
+
+% some other stuff we can include if we want
+ %\homepage{http://www.Second.institution.edu/~Charlie.Author.}
+ %\altaffiliation[Also at ]{Physics Department, XYZ University.}%Lines break automatically or can be forced with \\
+ %\email{Second.Author@institution.edu.}
+%\affiliation{ 
+%Chalmers University of Technology%\\This line break forced with \textbackslash\textbackslash
+%}%
+
+\date{\today}% It is always \today, today,
+             %  but any date may be explicitly specified
+
+\begin{abstract}
+%An article usually includes an abstract, a concise summary of the work
+%covered at length in the main body of the article. It is used for
+%secondary publications and for information retrieval purposes. 
+An abstract of the paper. Will be done last.
+%
+\listoftodos
+\end{abstract}
+
+\keywords{Suggested keywords}%Use showkeys class option if keyword
+                              %display desired
+\maketitle
+
+
+%% Assignment text: 
+% The report should be written in RevTex 4.2 (see https://journals.aps.org/revtex (Links to an external site.)), using the format of Physical Review X with a limit of 8 pages in double-column reprint format (including pictures and references). If needed, you can have an extra document containing an unlimited amount of Supplementary Materials.
+
+% Structure your report like a scientific article, with an abstract summarising the rationale and results of the project; an introduction shortly explaining its background and motivating why the question is interesting; methods and/or results section(s) describing your model and what you do with it; a discussion section; and ending with a conclusion. Put some work into the discussion and conclusion sections. This is where you demonstrate that you truly understand the implications of your work, including shortcomings and uncertainties. It is important that the discussion does not fall out as a simple summary of what the figures show.
+
+
+
+\input{sections/Introduction}
+\input{sections/Method}
+\input{sections/Results}
+\input{sections/Discussion}
+
+
+
+\bibliography{refs.bib}
+\end{document}

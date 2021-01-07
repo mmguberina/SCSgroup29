@@ -1,0 +1,107 @@
+\section{Introduction}
+This project explores the usage of random search algorithms in swarm robotics.
+We first introduce the concept of swarm robotics. 
+Many robotics applications call for usage of multiple robots, search being one of them, as it
+clearly it is easier to find desired targets if there are multiple agents performing the search operation.
+The term swarm robotics denotes the case when there are many robotic agents which when working together
+exhibit collective (group) behaviour.
+These robots are typically very simple and their operation is often inspired by animals such 
+as ants or bees.
+The benefits of using a large number of simple robots rather than a few more capable and complex robots
+are the following:
+\begin{itemize}
+		\item price -- such robots are very cheap to produce as they require just the basic of-the-shelf components
+		\item robustness -- failure of a single robot has a small impact on the overall result
+		\item scalability -- swarms are designed to handle a very large number of agents and new agents
+				can very easily be introduced as the swarm is typically controled in a distributed fashion
+		\item equally complex results 
+				-- even through the robots themselves are simple, they can produce complex
+				emergent behaviours and are thus very adaptable
+\end{itemize}
+Some of the above points need to be elaborated further. 
+Robustness is achieved by having all robots identical in both form and function which
+makes them mutually interchangable. 
+Having indentical robots also makes it easy to simply add more robots.
+However, additional care in algorithm design is required to avoid diminishing returns
+when adding new robots. Of course, at some point cluttering will prevent robots from moving,
+but we aim to achieve the full potential of the swarm.
+Achieving equally complex results is the key feature which needs to be delivered. 
+In essence, this means that we should view the swarm as a single ``distributed robot''
+which makes intelligent decisions to obtain the desired result. In other words,
+the swarm needs to feature collective emergent behaviour which makes it better
+than the sum of its parts, just like ants or bees.
+
+Now let us address the problem we wish to solve:
+achieving efficient autonomous search in unknown and/or changing environments.
+How a search problem is solved critically depends on a few factors:
+existance of a map and the ability of robots to localize themselves in the map.
+Clearly, if the robots know where they are and where they could go, classic search
+algorithms like A* would deliver provably optimal results.
+However, many environments are not (accuratelly) mapped, like forests or ocean floors,
+or they change over time. Furthermore, to localize robots must use GPS or
+have known landmarks from which they can estimate their position.
+This is so because odometry (starting from a known position and 
+then integrating velocity (which is locally known)) very quickly accumulates errors which makes it 
+unusable for all but short paths.
+In this project we deal with unknown GPS denied environments.
+
+Before proceeding to our solution, we need to discuss another important problem:
+coordination. In order to use deterministic coordination algorithms, the robots
+need to communicate. Given the environments we are interested in, robots would need to
+endowed with powerful radio antenas to communicate with a global central node and
+that would overall be very impractical. 
+Thus the only communication option in this case would be local communication between neighbouring robots.
+In the current implementation of the project this is not used, but there are situations in which
+it would be useful, for example to signal presence of multiple found targets.
+This is left as future work.
+
+
+
+The above leads us to the following solution: using random walks as search algorithms.
+This choise is in line with our design desires because it takes very little computational
+power to implement these algorithms and that enables us to have (very) small and low powered robots.
+One type of random walks are Levy walks. The idea is inspired by nature as 
+this type of walk can be can be observed in hunting paterns of many different types of animals.
+More importantly, we can mathematically show that this leads to higher area coverage efficiency 
+in an obstacle free environment when compared to other types of random walks.
+However, the situation is much more complicated in environments with obstacles. Namely, because
+the obstacles prevent the free movement of robots, the possible and the resulting walking patterns will 
+be different. 
+Furthermore, the robots must not colide with obstacles or other robots. Even with more lax
+collision requirements, they should at least
+avoid them to prevent getting stuck. To combat this problem, artificial potential fields are employed.
+In essence this just means that robots are repelled from obstacles each other by some amount.
+Another benefit of artificial potential fields in this case is that they help with diffusion of
+robots accross the environment. Given the role of artificial potential fields in this project, 
+they are manually defined to satisfy the collision avoidance requirement.
+These new complications introduced by obstacles lead us to our research questions:
+
+\begin{enumerate}
+\item How do different types of random search algorihms perform in different types of environments?
+\item Will switching and dynamic tuning of the random search algorihms produce better results?
+\end{enumerate}
+
+The rest of this project report is organized as follows: first we mathematically define 
+the random walks. We then introduce the environments we are interested in and 
+explain our usage of artificial potential fields.
+Next we present the derived robot control algorithms show their performance accross different 
+environments. Finally we provide a discussion of the results and the summary of our findings.
+
+
+
+There are a multitude of scenarios which consist of a search through unknown environments; some examples are: search and rescue in a burning building, searching for wildfires in a forest, trash collection (urban and in nature), mapping indoor environments and search for pollution. \TODO{Find references}
+
+%\begin{itemize}
+%\item Finding wildfires
+%\item Searching for people
+%\item Finding and picking up trash
+%\item Mapping indoor environments
+%\item Data collection in complex environments
+%  \begin{itemize}
+%  \item Fish population in oceans
+%  \item Pollution
+%  \end{itemize} 
+%\end{itemize} 
+
+\TODO{Paragraphs briefly explaining brownian motion, active brownian motion and Levy flights. Not very math-y, yet; we'll go into the proper theory in Methods. Just ``Brownian motion is a kind of random motion, used to model the random motion of particles, and was developed by Einstein back in the day'' etc.}
+

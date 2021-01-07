@@ -1,0 +1,41 @@
+EASY IMMEDIATELY IMPLEMENTABLE
+=======================================================================
+1. if you want the robots to not hit walls or each other, just treat their radii 
+as bigger than they actually are in when doing volume exclusion
+-----> this is (certainly) good enough and let's pretend its implementable as it is
+
+2. you don't need to check for neighbourhoods at every timestep! 
+   maybe every 5th or so is ok, and this makes stuff faster
+
+3. a cheap way to do with obstacles is to enforce non overlapping
+
+
+INTERMEDIATE HARDNESS
+=======================================================================
+3. change levy flight distribution to sample from power law and not cauchy
+	--> then it's easier to change the coefficient
+
+4. gradually release robots from the base
+===============================================================
+
+
+NON TRIVIAL PROBLEMS
+=============================
+4. (possible) new approach to getting forces from artificial potential fields
+	which solves the overalapping problem is very general (pictire of board on phone)
+
+5. use APF to do obstacle avoidance in a new state, i.e. stop doing whatever you were doing
+  	and just avoid the obstacle via APF
+
+
+6. solve radial fields thing? -> no way that's gonna happen tho
+ but one can dream lel
+
+
+
+later (after the date) futher improvemnets
+----------------------------------------
+when spotting a group of items, signal their presence (add a spherical signal 
+as an addition to whatever state you are in. this then acts like a lighthouse
+or whatever)
+

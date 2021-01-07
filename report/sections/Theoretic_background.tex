@@ -1,0 +1,17 @@
+\section{Background}
+
+\subsection{Comparison of different random walks}
+Three types of walks: Brownian motion, active brownian motion and Levy flights.\TODO{can we call brownian motion and active brownian motion different types of walks? We can, right?} \note{\cite{basu2018active} talks a bit about how Active brownian motion is similar to brownian motion on a very long timescale, but initially it is very different. Maybe that's worth mentioning? (See section II. Model)}
+
+\subsection{Artificial potential field}
+There are currently no ways to ensure that the agents avoid collisions, both with each other and with obstacles. During simulation, the agents can pass through each other without problem, but in real life situations we need to avoid collisions to avoid damage. \note{Feels kinda stupid to note that we want to avoid collisions, but on the other hand I feel like stuff like that is nice to mention?}
+
+One remedy to keep them from colliding is to imbue the agents and obstacles with artificial potential fields, which repulses them from each other, with the strength of the repulsion increasing as the distance between the objects decreases. 
+% inverse proportionally? Inverse square? 
+
+
+
+
+
+\subsection{Optimizing parameters with a genetic algorithm} 
+TBD. Have the algorithm, need to figure out how to run it with the simulation. 
