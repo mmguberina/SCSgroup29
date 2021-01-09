@@ -30,10 +30,12 @@ def writeToFilee(dataFileName, N, nOfRobots, gridSize, v, particle_radius, torqu
     dataFile.write("stuckThresholdDistance " + str(stuckThresholdDistance) + "\n")
     dataFile.write("percetangeOfCoverage " + str(percetangeOfCoverage) + "\n")
     dataFile.write("delivery_station " + str(delivery_station) + "\n")
-    dataFile.write("obstacles " + str(obstacles) + "\n")
-    dataFile.write("item_positions_set " + str(item_positions_set) + "\n")
-    dataFile.write("nOfCollectedItemsPerTime " + str(nOfCollectedItemsPerTime) + "\n")
-    dataFile.write("item_positions_listPerTime " + str(item_positions_listPerTime) + "\n")
+#    dataFile.write("obstacles " + str(obstacles) + "\n")
+#    dataFile.write("item_positions_set " + str(item_positions_set) + "\n")
+    dataFile.write("nOfCollectedItemsPerTime: " + "\n")
+    for timestamp, nOfIt in np.array(nOfCollectedItemsPerTime):
+        dataFile.write(str(timestamp) + "," + str(nOfIt) + "\n")
+#    dataFile.write("item_positions_listPerTime " + str(item_positions_listPerTime) + "\n")
 
     dataFile.close()
 

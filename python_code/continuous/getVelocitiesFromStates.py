@@ -145,6 +145,27 @@ def generateLevyFlightSteps(v, swimmers, gridSize):
     return newLevySwimmers
 
 
+def generateFlightFromPowerLaw(v, fi, ni, swimmers, gridSize, power):
+    nOfSwimmers = len(swimmers)
+    newLevySwimmers = {}
+
+    randStepLengths = np.fix(1 / np.random.power(power, nOfSwimmers))
+    # standard dev of 1 will be ok
+    randOrientationChange = (np.random.random(nOfSwimmers) - 0.5) 
+
+    newFi = fi[list(swimmers)]
+
+    v_hat = np.hstack(( np.cos(newFi).reshape((nOfSwimmers,1)), 
+            np.sin(newFi).reshape((nOfSwimmers,1))))
+
+    ind = 0
+    for i in swimmers:
+        fi[i] = fi[i] + randOrientationChange[ind]
+        # make this less crude if possible
+        newLevySwimmers[i] = [v_hat[ind], randStepLengths[ind]]
+        ind += 1
+    return newLevySwimmers
+
 def levySwim(levySwimmers, v_hat):
     for i in levySwimmers:
         v_hat[i] = levySwimmers[i][0]

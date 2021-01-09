@@ -7,7 +7,7 @@ from getVelocitiesFromStates import *
 
 def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
                    v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
-                   walkType, ni, deviation,                                         # random walk params
+                   walkType, ni, power, deviation,                                         # random walk params
                    T0, FR0, FI0, FO0, TR0, TO0,                                                   # artificial potential field parameters 
                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance       # unstucking parameters
                    ):
@@ -75,7 +75,10 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
 # TODO they need to be able to switch from state 4 which they don't do right now
         if walkType == 'levyFlight':
             # handle state 3 - unstucking
+            # old
             newLevySwimmers = generateLevyFlightSteps(v, explorers, gridSize)
+            # new
+            newLevySwimmers = generateFlightFromPowerLaw(v, fi, 1, explorers, gridSize, power)
             levySwimmers.update(newLevySwimmers)
             for robo in newLevySwimmers:
                 robot_states[robo] = 4

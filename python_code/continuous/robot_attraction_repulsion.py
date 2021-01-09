@@ -73,7 +73,12 @@ robot_statesPerTime = np.zeros((1 * nOfRobots,N+1))
 #nOfItems = 10
 nOfItems = 25
 
-percetangeOfCoverage = 0.01
+# sparse
+#percetangeOfCoverage = 0.001
+# medium
+#percetangeOfCoverage = 0.01
+# dense
+percetangeOfCoverage = 0.04
 delivery_station = np.array([gridSize // 2, gridSize // 2])
 
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
@@ -81,8 +86,8 @@ obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, del
 
 item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
-#walkType = 'levyFlight'
-walkType = 'activeSwimming'
+walkType = 'levyFlight'
+#walkType = 'activeSwimming'
 #walkType = 'brownianMotion'
 
 

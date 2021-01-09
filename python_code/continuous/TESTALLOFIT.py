@@ -9,7 +9,7 @@ from queue import Empty
 import os
 
 
-def do5Tests(jobQueue):
+def do15Tests(jobQueue):
     while True:
         try:
             params = jobQueue.get(False)
@@ -19,11 +19,11 @@ def do5Tests(jobQueue):
         print("Process", os.getpid(), "running", params)
 
         N, nOfRobots, gridSize, v, particle_radius, torque_radius,\
-        obstacleRadius, walkType, ni, deviation, T0, FR0, FI0, FO0,TR0, TO0,\
+        obstacleRadius, walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,\
         nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance, percetangeOfCoverage = params
 
         # run 5 tests to get at least some averaging
-        for i in range(5):
+        for i in range(15):
             print("doing the", i+1, "test for given params")
 
             x = np.zeros((1 * nOfRobots,N+1))
@@ -80,11 +80,14 @@ def do5Tests(jobQueue):
 
 if __name__ == '__main__':
 
-    nsOfRobots = [i for i in range(5,80,15)]
+    #nsOfRobots = [i for i in range(5,80,15)]
+    nsOfRobots = [30]
     #rot_dif_T = 0.2
     #trans_dif_T = 0.2
     #v = 1
     nis = np.pi * np.array([1/i for i in range(5,500,100)])
+    powers = np.array([1, 1.25, 1.5, 1.75, 2])
+    power = 0
     #v = 0.05
     v = 0.3
     # Total time.
@@ -117,11 +120,11 @@ if __name__ == '__main__':
     stuckThresholdTime = 300
     stuckThresholdDistance = v * 300
 
-    N = 14000
+    N = 20000
     #obstacleClusters = indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius)
 
 
-    walkTypes = ['levyFlight', 'activeSwimming','brownianMotion']
+    walkTypes = ['levyFlight', 'activeSwimming']
 
     #nsOfItems = [i for i in range(10,90,20)]
     nsOfItems = [40]
@@ -133,24 +136,25 @@ if __name__ == '__main__':
                 for nOfItems in nsOfItems:
                     for walkType in walkTypes:
                         if walkType == 'levyFlight':
+                            for power in powers:
                             #jobs.append(1)
-                            jobs.append((N, nOfRobots, gridSize,v, 
-                                particle_radius, torque_radius, obstacleRadius, 
-                                walkType, ni, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
-                                nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
-                                percetangeOfCoverage))
+                                jobs.append((N, nOfRobots, gridSize,v, 
+                                    particle_radius, torque_radius, obstacleRadius, 
+                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
+                                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
+                                    percetangeOfCoverage))
                         if walkType == 'activeSwimming':
                             for ni in nis:
                                 jobs.append((N, nOfRobots, gridSize,v, 
                                     particle_radius, torque_radius, obstacleRadius, 
-                                    walkType, ni, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
+                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
                                     nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
                                     percetangeOfCoverage))
                         if walkType == 'brownianMotion':
                             for deviation in deviations:
                                 jobs.append((N, nOfRobots, gridSize,v, 
                                     particle_radius, torque_radius, obstacleRadius, 
-                                    walkType, ni, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
+                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
                                     nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
                                     percetangeOfCoverage))
     print(len(jobs))
@@ -162,13 +166,12 @@ if __name__ == '__main__':
 
     nOfProcesses = 4
     jobQueue = mp.Queue()
-    jobs = jobs[133:136]
     for job in jobs:
         jobQueue.put(job)
 
     listOfProcesses = []
     for _ in range(nOfProcesses):
-        p = mp.Process(target=do5Tests, args=(jobQueue,))
+        p = mp.Process(target=do15Tests, args=(jobQueue,))
         p.start()
         listOfProcesses.append(p)
 
