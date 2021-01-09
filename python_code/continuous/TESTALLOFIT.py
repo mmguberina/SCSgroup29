@@ -163,6 +163,7 @@ if __name__ == '__main__':
 # desktops take 50
 # laptop takes 50
 # laptop takes the rest,i.e. 65 
+    jobs = jobs[:15]
 
     nOfProcesses = 4
     jobQueue = mp.Queue()
