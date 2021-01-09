@@ -39,7 +39,7 @@ def do15Tests(jobQueue):
                 runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
                         robot_statesPerTime, v, particle_radius, 
                         torque_radius, obstacles,obstacleRadius, 
-                        walkType, ni, deviation, 
+                        walkType, ni, power, deviation, 
                         T0, FR0, FI0, FO0,TR0, TO0,  
                         nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     stuckThresholdTime = 300
     stuckThresholdDistance = v * 300
 
-    N = 20000
+    N = 16000
     #obstacleClusters = indentifyObstacleClusters(obstacles, obstacleRadius, particle_radius)
 
 
@@ -157,7 +157,7 @@ if __name__ == '__main__':
                                     walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
                                     nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
                                     percetangeOfCoverage))
-    print(len(jobs))
+    print("nofjobs", len(jobs))
 
 
 # desktops take 50
