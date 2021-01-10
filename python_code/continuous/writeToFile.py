@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def writeToFilee(dataFileName, N, nOfRobots, gridSize, v, particle_radius, torque_radius,\
         obstacleRadius, walkType, ni, deviation, T0, FR0, FI0, FO0,TR0, TO0,\

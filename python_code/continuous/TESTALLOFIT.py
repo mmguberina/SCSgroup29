@@ -7,6 +7,19 @@ import pandas as pd
 import multiprocessing as mp
 from queue import Empty
 import os
+import subprocess
+import re
+
+def hasThisTestBeenDoneAlready(nname):
+    child = subprocess.Popen(['ls', './data2'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    files_in_datadir = child.stdout.read().decode('utf-8').split("\n")
+    regex = re.compile(nname + ".*")
+    for  fil in files_in_datadir:
+        rez = regex.search(fil)
+        if rez != None:
+            return True
+    return False
+
 
 
 def do15Tests(jobQueue):
@@ -35,6 +48,21 @@ def do15Tests(jobQueue):
             obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
             item_positions_set, item_positions_list = initializeItems(nOfItems, gridSize, obstacles, obstacleRadius)
 
+            nname = str(nOfRobots) + "__" + str(walkType) + str(power) + "_" \
+                            + str(deviation) + "_" + str(percetangeOfCoverage) \
+                            + "_" + str(i+1)
+            # skip it if we already did this test
+            if hasThisTestBeenDoneAlready(nname):
+                print("this test has been done already", nname)
+                continue
+
+
+            dataFileName = "./data2/" + str(nOfRobots) + "__" + str(walkType) + str(power) + "_" \
+                            + str(deviation) + "_" + str(percetangeOfCoverage) \
+                            + "_" + str(i+1)
+
+
+
             x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
                 runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
                         robot_statesPerTime, v, particle_radius, 
@@ -45,9 +73,6 @@ def do15Tests(jobQueue):
 
 
 
-            dataFileName = "./data/" + str(nOfRobots) + "_" + str(walkType) + str(ni) + "_" \
-                            + str(deviation) + "_" + str(percetangeOfCoverage) \
-                            + "_" + str(i+1)
                            
             fid_x = open(dataFileName + "_x.csv", "w")
             fid_y = open(dataFileName + "_y.csv", "w")
@@ -143,27 +168,27 @@ if __name__ == '__main__':
                                     walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
                                     nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
                                     percetangeOfCoverage))
-                        if walkType == 'activeSwimming':
-                            for ni in nis:
-                                jobs.append((N, nOfRobots, gridSize,v, 
-                                    particle_radius, torque_radius, obstacleRadius, 
-                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
-                                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
-                                    percetangeOfCoverage))
-                        if walkType == 'brownianMotion':
-                            for deviation in deviations:
-                                jobs.append((N, nOfRobots, gridSize,v, 
-                                    particle_radius, torque_radius, obstacleRadius, 
-                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
-                                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
-                                    percetangeOfCoverage))
+#                        if walkType == 'activeSwimming':
+#                            for ni in nis:
+#                                jobs.append((N, nOfRobots, gridSize,v, 
+#                                    particle_radius, torque_radius, obstacleRadius, 
+#                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
+#                                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
+#                                    percetangeOfCoverage))
+#                        if walkType == 'brownianMotion':
+#                            for deviation in deviations:
+#                                jobs.append((N, nOfRobots, gridSize,v, 
+#                                    particle_radius, torque_radius, obstacleRadius, 
+#                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
+#                                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
+#                                    percetangeOfCoverage))
     print("nofjobs", len(jobs))
 
 
 # desktops take 50
 # laptop takes 50
 # laptop takes the rest,i.e. 65 
-    jobs = jobs[:15]
+    #jobs = jobs[20:]
 
     nOfProcesses = 4
     jobQueue = mp.Queue()

@@ -134,13 +134,16 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
                 if robsWithNearItems[robo] == (-1,-1):
                     robot_states[robo] = 0
                     continue
-                robot_storage[robo].append(robsWithNearItems[robo])
-                item_positions_set.remove(robsWithNearItems[robo])
-                nOfItems -= 1
+                try:
+                    robot_storage[robo].append(robsWithNearItems[robo])
+                    item_positions_set.remove(robsWithNearItems[robo])
+                    nOfItems -= len(robot_storage[robo])
+                    # put it in going back mode
+                    robot_states[robo] = 1
+                    nOfDeliveredItems += 1
+                except:
+                    pass
 
-                # put it in going back mode
-                robot_states[robo] = 1
-                nOfDeliveredItems += 1
 
                 if nOfDeliveredItems == nOfStartingItems:
                     print("done")
