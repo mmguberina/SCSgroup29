@@ -78,3 +78,63 @@ def animate(x, y, robot_statesPerTime, item_positions, N, nOfRobots, particle_ra
 
 
 
+
+def drawFrame(x, y, robot_states, item_positions_list, nOfRobots, particle_radius, ax, delivery_station, obstacles, obstacleRadius, torque_radius):
+    currently_collected = 0
+    # in case there won't be any, otherwise it's assigned below
+
+    clusteredP = set()
+    cluster2 = set()
+    actActNeig = {i:[] for i in range(nOfRobots)}
+
+    pos = np.hstack((x.reshape((nOfRobots,1)), 
+                     y.reshape((nOfRobots,1))))
+
+    for i in range(nOfRobots):
+        r = pos[i] - pos 
+        rnorms = np.linalg.norm(r, axis=1).reshape((nOfRobots,1))
+        cluster2 = cluster2.union({tuple(pos[j]) for j in range(nOfRobots) if rnorms[j] < 2.1*particle_radius and rnorms[j] > 0})
+
+    for obstacle in obstacles:
+        circle = Circle(tuple(obstacle), obstacleRadius, color='black')
+        ax.add_patch(circle)
+
+    i = 0
+    for robot in zip(x, y):
+        circle = Circle(robot, particle_radius, color='red')
+        if robot_states[i] == 0:
+            color_vs = 'wheat'
+        if robot_states[i] == 1:
+            color_vs = 'green'
+        if robot_states[i] == 2:
+            color_vs = 'lightsalmon'
+        if robot_states[i] == 3:
+            color_vs = 'darkred'
+        if robot_states[i] == 4:
+            color_vs = 'goldenrod'
+        visSphere = Circle(robot, torque_radius, alpha=0.3, color=color_vs)
+        ax.add_patch(visSphere)
+        ax.add_patch(circle)
+        i += 1
+
+    if len(item_positions_list) > 0:
+        for item in zip(item_positions_list[:,0], item_positions_list[:,1]):
+            circle = Circle(item, particle_radius, color='green')
+            ax.add_patch(circle)
+    
+    if len(cluster2) > 0:
+        for clst in cluster2:
+            clst = Circle(clst, particle_radius, color='blue')
+            ax.add_patch(circle)
+
+    circle = Circle(tuple(delivery_station), particle_radius, facecolor='yellow', edgecolor='black')
+    ax.add_patch(circle)
+
+#    ax.axis('scaled')
+
+    #ax.scatter(walls[:,0], walls[:,1], s=s, color='black')
+        #ax.scatter(cluster2[:, 0], cluster2[:, 1], color='blue')
+#            ax.set_title("total delivered items: " + str(currently_collected))
+
+
+

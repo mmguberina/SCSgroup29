@@ -160,21 +160,21 @@ if __name__ == '__main__':
             for percetangeOfCoverage in percetangesOfCoverage:
                 for nOfItems in nsOfItems:
                     for walkType in walkTypes:
-                        if walkType == 'levyFlight':
-                            for power in powers:
+#                        if walkType == 'levyFlight':
+#                            for power in powers:
                             #jobs.append(1)
-                                jobs.append((N, nOfRobots, gridSize,v, 
-                                    particle_radius, torque_radius, obstacleRadius, 
-                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
-                                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
-                                    percetangeOfCoverage))
-#                        if walkType == 'activeSwimming':
-#                            for ni in nis:
 #                                jobs.append((N, nOfRobots, gridSize,v, 
 #                                    particle_radius, torque_radius, obstacleRadius, 
 #                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
 #                                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
 #                                    percetangeOfCoverage))
+                        if walkType == 'activeSwimming':
+                            for ni in nis:
+                                jobs.append((N, nOfRobots, gridSize,v, 
+                                    particle_radius, torque_radius, obstacleRadius, 
+                                    walkType, ni, power, deviation, T0, FR0, FI0, FO0,TR0, TO0,  
+                                    nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,
+                                    percetangeOfCoverage))
 #                        if walkType == 'brownianMotion':
 #                            for deviation in deviations:
 #                                jobs.append((N, nOfRobots, gridSize,v, 
@@ -188,9 +188,9 @@ if __name__ == '__main__':
 # desktops take 50
 # laptop takes 50
 # laptop takes the rest,i.e. 65 
-    #jobs = jobs[20:]
+    jobs = jobs[3:5]
 
-    nOfProcesses = 4
+    nOfProcesses = 5
     jobQueue = mp.Queue()
     for job in jobs:
         jobQueue.put(job)

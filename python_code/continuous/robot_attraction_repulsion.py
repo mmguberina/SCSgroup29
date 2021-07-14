@@ -20,6 +20,8 @@ ni = nis[-1]
 v = 0.3
 # Total time.
 
+power = 1.5
+
 # TODO PLAY WITH THESE VALUES SEE WHAT HAPPENS TODO
 obstacleRadius = 30
 gridSize = 800
@@ -49,12 +51,13 @@ deviation = 0.15
 
 nOfUnstuckingSteps = 600
 stuckThresholdTime = 300
-stuckThresholdDistance = v * 300
+stuckThresholdDistance = v * 6
 
 rot_dif_T = 0.2
 trans_dif_T = 0.2
 # Number of steps.
-N = 8000
+#N = 8000
+N = 1000
 #N = 5000
 # Initial values of x.
 x = np.zeros((1 * nOfRobots,N+1))
@@ -76,9 +79,9 @@ nOfItems = 25
 # sparse
 #percetangeOfCoverage = 0.001
 # medium
-#percetangeOfCoverage = 0.01
+percetangeOfCoverage = 0.01
 # dense
-percetangeOfCoverage = 0.04
+#percetangeOfCoverage = 0.04
 delivery_station = np.array([gridSize // 2, gridSize // 2])
 
 obstacles = initializeRandom(percetangeOfCoverage, gridSize, obstacleRadius, delivery_station)
@@ -90,13 +93,16 @@ walkType = 'levyFlight'
 #walkType = 'activeSwimming'
 #walkType = 'brownianMotion'
 
+render = True
+
 
 x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
     runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  robot_statesPerTime, # sim params
                    v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
-                   walkType, ni, deviation,                                          # random walk params
+                   walkType, ni, power, deviation,                                          # random walk params
                    T0, FR0, FI0, FO0,TR0, TO0,                                                    # artificial potential field parameters 
-                   nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance)       # unstucking parameters
+                   nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,            # unstucking parameters
+                   render)                                                              # render
 
 
 
@@ -108,18 +114,18 @@ x, y, nOfCollectedItemsPerTime, item_positions_listPerTime = \
 # it will work if you put it all in a dictionary!
 
 
-fig, ax = plt.subplots()
-ax.grid()
+#fig, ax = plt.subplots()
+#ax.grid()
 # Plot the 2D trajectory.
 # the camera way
-camera = Camera(fig)
+#camera = Camera(fig)
 
 # item_positions_list changes, you need to send a list of lists to know the changes
-animate(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_radius, ax, camera, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
+#animate(x, y, robot_statesPerTime, item_positions_list, N, nOfRobots, particle_radius, ax, camera, nOfCollectedItemsPerTime, item_positions_listPerTime, delivery_station, obstacles, obstacleRadius, torque_radius)
 
 
-animation = camera.animate()
-animation.save('new_anim' + '.mp4')
+#animation = camera.animate()
+#animation.save('new_anim' + '.mp4')
 
 # funcanim way
 #nOfSkippedFrames = 1
@@ -127,4 +133,4 @@ animation.save('new_anim' + '.mp4')
 #anim.save('testest.mp4')
 
 
-plt.show()
+#plt.show()

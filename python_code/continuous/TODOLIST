@@ -3,6 +3,17 @@ in rough order of importance
 yeah i'm leaving this as this is all TBD
 at some later point 
 
+##################################################
+# optimisation necessary for scale (and sense)
+##################################################
+1. checking for collisions can be done much more efficiently:
+check https://www.youtube.com/watch?v=eED4bSkYCB8 for reference
+2. add networking in the picture to automatically gather data on one
+computer
+---> use sockets, have a "master" program which only gets the data and writes
+when needed
+
+
 ##############################################
 # fields things
 ##############################################

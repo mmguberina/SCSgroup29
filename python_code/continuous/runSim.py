@@ -9,8 +9,22 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
                    v, particle_radius, torque_radius, obstacles,obstacleRadius,         # environment robot physical params 
                    walkType, ni, power, deviation,                                         # random walk params
                    T0, FR0, FI0, FO0, TR0, TO0,                                                   # artificial potential field parameters 
-                   nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance       # unstucking parameters
+                   nOfUnstuckingSteps, stuckThresholdTime, stuckThresholdDistance,       # unstucking parameters
+                   render                                                               # rendering flag
                    ):
+
+    # create the figure which is to be continuosly updated
+
+    if render == True:
+        plt.ion()
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # these are for axes scaling which does not happen automatically
+        ax.plot(np.array([0]), np.array([0]), c='b')
+        # NOTE: if the limits will shake then set the limits manually (to gridsize, just center it right)
+        #plt.xlim([-1.5,1.5])
+        #plt.ylim([-0.5,1.5])
+
 
     nOfCollectedItemsPerTime = [[0,0]]
     item_positions_list = np.array(list(item_positions_set))
@@ -242,9 +256,16 @@ def runSim(x, y, item_positions_set, delivery_station, N, nOfRobots, gridSize,  
         # esentially this means that volume exclusion will update the x and y array
         # which exists as the code is running, i.e. they won't be copied when entering to 
         # the function
-        # think of this function as simply having the code put in another place, not
+        # think of this function as simply having put the code in another place, not
         # really a function with inputs and outputs
         volumeExclusion(x, y, pos, step, robRobNeig, robObsNeig, particle_radius, nOfRobots, obstacleRadius)
         # this will be used for interpretable animation
         robot_statesPerTime[:,step] = robot_states 
+
+        # draw the current frame 
+        if render == True:
+            if step % 40 == 0:
+                drawFrame(x[:,step+1], y[:,step+1], robot_states, item_positions_list, nOfRobots, particle_radius, ax, delivery_station, obstacles, obstacleRadius, torque_radius)
+                fig.canvas.draw()
+                fig.canvas.flush_events()
     return x, y, nOfCollectedItemsPerTime, item_positions_listPerTime
